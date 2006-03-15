@@ -1,6 +1,6 @@
 Name:           ecl
 Version:        0.9h
-Release:        4
+Release:        4%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
@@ -8,7 +8,7 @@ License:        LGPL
 URL:            http://ecls.sourceforge.net
 Source0:	http://switch.dl.sourceforge.net/sourceforge/ecls/ecl-0.9h.tgz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildRequires:	xorg-x11-devel
+BuildRequires:	libX11-devel
 BuildRequires:	m4
 BuildRequires:	texinfo
 Requires(post): /sbin/install-info

@@ -1,6 +1,6 @@
 Name:           ecl
 Version:        0.9i
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
@@ -79,6 +79,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Sun Jul 23 2006 Gerard Milmeister <gemi@bluewin.ch> - 0.9i-2
+- release number fix
+
 * Sat Jul  8 2006 Gerard Milmeister <gemi@bluewin.ch> - 0.9i-1
 - new version 0.9i
 

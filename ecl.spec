@@ -1,19 +1,21 @@
 Name:           ecl
-Version:        0.9i
-Release:        3%{?dist}
+Version:        0.9j
+Release:        1%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
-License:        LGPL
+License:        LGPLv2+
 URL:            http://ecls.sourceforge.net
-Source0:	http://switch.dl.sourceforge.net/sourceforge/ecls/ecl-0.9i.tgz
-Patch1:		ecl-0.9i-gcc41.patch
+Source0:	http://switch.dl.sourceforge.net/sourceforge/ecls/ecl-0.9j.tgz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:	libX11-devel
 BuildRequires:	m4
 BuildRequires:	texinfo
-Requires(post): /sbin/install-info, policycoreutils
-Requires(postun): /sbin/install-info, policycoreutils
+BuildRequires:  texi2html
+BuildRequires:  gmp-devel
+Requires:       gcc
+Requires(post): policycoreutils
+Requires(postun): policycoreutils
 
 %description
 ECL (Embeddable Common-Lisp) is an interpreter of the Common-Lisp
@@ -27,15 +29,15 @@ to C, which can produce standalone executables.
 
 %prep
 %setup0 -q
-%patch1 -p1
 # wrong character in texinfo file
 perl -pi -e 's|\xc7||' src/doc/user.txi
 # set rpath to the final path
 perl -pi -e 's|-Wl,--rpath,~A|-Wl,--rpath,%{_libdir}/ecl|' src/configure
+find -name CVS | xargs rm -rf
 
 
 %build
-%configure --enable-boehm=included --enable-threads=yes --with-cxx
+%configure --enable-boehm=included --enable-threads=yes --with-clx
 make -k
 (cd build/doc; make all html)
 
@@ -43,25 +45,24 @@ make -k
 %install
 rm -rf $RPM_BUILD_ROOT
 make DESTDIR=$RPM_BUILD_ROOT install
-rm -f $RPM_BUILD_ROOT%{_infodir}/dir
+(cd build/doc; make DESTDIR=$RPM_BUILD_ROOT install)
+rm -fr $RPM_BUILD_ROOT%{_infodir}/dir
 rm -fr $RPM_BUILD_ROOT%{_docdir}
 
 find $RPM_BUILD_ROOT%{_libdir}/ecl -name '*.lsp' | xargs chmod 0644
 
 
 %post
-/sbin/install-info %{_infodir}/ecldev.info %{_infodir}/dir 2>/dev/null || :
-/sbin/install-info %{_infodir}/ecl.info %{_infodir}/dir 2>/dev/null || :
-/usr/sbin/semanage fcontext -a -t textrel_shlib_t "%{_libdir}/ecl/libecl.so" 2>/dev/null || :
-/sbin/restorecon "%{_libdir}/ecl/libecl.so" 2> /dev/null || :
+/usr/sbin/semanage fcontext -a -t textrel_shlib_t "%{_libdir}/libecl.so" 2>/dev/null || :
+/sbin/restorecon "%{_libdir}/libecl.so" 2> /dev/null || :
+/sbin/ldconfig
 
  
 %postun
 if [ $1 = 0 ]; then
-  /sbin/install-info --delete %{_infodir}/ecldev.info %{_infodir}/dir 2>/dev/null || :
-  /sbin/install-info --delete %{_infodir}/ecl.info %{_infodir}/dir 2>/dev/null || :
-  /usr/sbin/semanage fcontext -d -t textrel_shlib_t "%{_libdir}/ecl/libecl.so" 2>/dev/null || :
+  /usr/sbin/semanage fcontext -d -t textrel_shlib_t "%{_libdir}/libecl.so" 2>/dev/null || :
 fi
+/sbin/ldconfig
 
 
 %clean
@@ -73,12 +74,19 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/ecl
 %{_bindir}/ecl-config
 %{_libdir}/ecl
+%{_libdir}/libecl.so
+%{_includedir}/ecl
 %{_mandir}/man*/*
 %{_infodir}/*
-%doc ANNOUNCEMENT Copyright LGPL README.1st build/doc/*.html build/doc/ecl build/doc/ecldev
+%doc ANNOUNCEMENT Copyright LGPL
+%doc build/doc/*.html build/doc/ecl build/doc/ecldev
+%doc examples
 
 
 %changelog
+* Sat Dec 29 2007 Gerard Milmeister <gemi@bluewin.ch> - 0.9j-1
+- new release 0.9j
+
 * Mon Aug 28 2006 Gerard Milmeister <gemi@bluewin.ch> - 0.9i-3
 - Rebuild for FE6
 

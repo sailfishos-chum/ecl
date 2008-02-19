@@ -1,6 +1,6 @@
 Name:           ecl
 Version:        0.9j
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
@@ -84,6 +84,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Feb 18 2008 Fedora Release Engineering <rel-eng@fedoraproject.org> - 0.9j-2
+- Autorebuild for GCC 4.3
+
 * Sat Dec 29 2007 Gerard Milmeister <gemi@bluewin.ch> - 0.9j-1
 - new release 0.9j
 

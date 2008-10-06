@@ -1,6 +1,6 @@
 Name:           ecl
 Version:        0.9l
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
@@ -31,9 +31,9 @@ to C, which can produce standalone executables.
 %prep
 %setup0 -q
 # wrong character in texinfo file
-sed -i 's|\xc7||' src/doc/user.txi
+sed -i 's|\xc7||g' src/doc/user.txi
 # set rpath to the final path
-sed -i's|-Wl,--rpath,~A|-Wl,--rpath,%{_libdir}/ecl|' src/configure
+sed -i's|-Wl,--rpath,~A|-Wl,--rpath,%{_libdir}/ecl|g' src/configure
 find -name CVS | xargs rm -rf
 
 
@@ -89,6 +89,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Oct  6 2008 Gerard Milmeister <gemi@bluewin.ch> - 0.9l-2
+- disable ppc64 (fails to build)
+
 * Wed Aug  6 2008 Gerard Milmeister <gemi@bluewin.ch> - 0.9l-1
 - new release 0.9l
 

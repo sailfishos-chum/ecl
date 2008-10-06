@@ -1,6 +1,6 @@
 Name:           ecl
 Version:        0.9l
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
@@ -33,7 +33,7 @@ to C, which can produce standalone executables.
 # wrong character in texinfo file
 sed -i 's|\xc7||g' src/doc/user.txi
 # set rpath to the final path
-sed -i's|-Wl,--rpath,~A|-Wl,--rpath,%{_libdir}/ecl|g' src/configure
+sed -i 's|-Wl,--rpath,~A|-Wl,--rpath,%{_libdir}/ecl|g' src/configure
 find -name CVS | xargs rm -rf
 
 

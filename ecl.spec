@@ -1,12 +1,12 @@
 Name:           ecl
-Version:        0.9j
-Release:        2%{?dist}
+Version:        0.9l
+Release:        1%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
 License:        LGPLv2+
 URL:            http://ecls.sourceforge.net
-Source0:	http://switch.dl.sourceforge.net/sourceforge/ecls/ecl-0.9j.tgz
+Source0:	http://switch.dl.sourceforge.net/sourceforge/ecls/ecl-%{version}.tgz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:	libX11-devel
 BuildRequires:	m4
@@ -14,8 +14,9 @@ BuildRequires:	texinfo
 BuildRequires:  texi2html
 BuildRequires:  gmp-devel
 Requires:       gcc
-Requires(post): policycoreutils
-Requires(postun): policycoreutils
+Requires(post): policycoreutils /sbin/install-info
+Requires(postun): policycoreutils /sbin/install-info
+ExcludeArch:    ppc64
 
 %description
 ECL (Embeddable Common-Lisp) is an interpreter of the Common-Lisp
@@ -30,15 +31,15 @@ to C, which can produce standalone executables.
 %prep
 %setup0 -q
 # wrong character in texinfo file
-perl -pi -e 's|\xc7||' src/doc/user.txi
+sed -i 's|\xc7||' src/doc/user.txi
 # set rpath to the final path
-perl -pi -e 's|-Wl,--rpath,~A|-Wl,--rpath,%{_libdir}/ecl|' src/configure
+sed -i's|-Wl,--rpath,~A|-Wl,--rpath,%{_libdir}/ecl|' src/configure
 find -name CVS | xargs rm -rf
 
 
 %build
 %configure --enable-boehm=included --enable-threads=yes --with-clx
-make -k
+make
 (cd build/doc; make all html)
 
 
@@ -51,16 +52,21 @@ rm -fr $RPM_BUILD_ROOT%{_docdir}
 
 find $RPM_BUILD_ROOT%{_libdir}/ecl -name '*.lsp' | xargs chmod 0644
 
-
 %post
 /usr/sbin/semanage fcontext -a -t textrel_shlib_t "%{_libdir}/libecl.so" 2>/dev/null || :
 /sbin/restorecon "%{_libdir}/libecl.so" 2> /dev/null || :
+/sbin/install-info %{_infodir}/ecl.info %{_infodir}/dir 2>/dev/null || :
+/sbin/install-info %{_infodir}/ecldev.info %{_infodir}/dir 2>/dev/null || :
+/sbin/install-info %{_infodir}/clx.info %{_infodir}/dir 2>/dev/null || :
 /sbin/ldconfig
 
  
 %postun
 if [ $1 = 0 ]; then
   /usr/sbin/semanage fcontext -d -t textrel_shlib_t "%{_libdir}/libecl.so" 2>/dev/null || :
+  /sbin/install-info --delete %{_infodir}/ecl.info %{_infodir}/dir 2>/dev/null || :
+  /sbin/install-info --delete %{_infodir}/ecldev.info %{_infodir}/dir 2>/dev/null || :
+  /sbin/install-info --delete %{_infodir}/clx.info %{_infodir}/dir 2>/dev/null || :
 fi
 /sbin/ldconfig
 
@@ -79,11 +85,13 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man*/*
 %{_infodir}/*
 %doc ANNOUNCEMENT Copyright LGPL
-%doc build/doc/*.html build/doc/ecl build/doc/ecldev
 %doc examples
 
 
 %changelog
+* Wed Aug  6 2008 Gerard Milmeister <gemi@bluewin.ch> - 0.9l-1
+- new release 0.9l
+
 * Mon Feb 18 2008 Fedora Release Engineering <rel-eng@fedoraproject.org> - 0.9j-2
 - Autorebuild for GCC 4.3
 

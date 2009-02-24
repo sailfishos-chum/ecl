@@ -1,6 +1,6 @@
 Name:           ecl
 Version:        0.9l
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
@@ -89,6 +89,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Tue Feb 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.9l-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
+
 * Mon Oct  6 2008 Gerard Milmeister <gemi@bluewin.ch> - 0.9l-2
 - disable ppc64 (fails to build)
 

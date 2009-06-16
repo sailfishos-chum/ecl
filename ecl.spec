@@ -1,12 +1,13 @@
 Name:           ecl
-Version:        0.9l
-Release:        4%{?dist}
+Version:        9.6.1
+Release:        1%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
 License:        LGPLv2+
 URL:            http://ecls.sourceforge.net
-Source0:	http://switch.dl.sourceforge.net/sourceforge/ecls/ecl-%{version}.tgz
+Source0:	http://switch.dl.sourceforge.net/sourceforge/ecls/ecl-9.6.0.tgz
+Patch0:         ecl-9.6.1-mp.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:	libX11-devel
 BuildRequires:	m4
@@ -30,6 +31,7 @@ to C, which can produce standalone executables.
 
 %prep
 %setup0 -q
+%patch0 -p1
 # wrong character in texinfo file
 sed -i 's|\xc7||g' src/doc/user.txi
 # set rpath to the final path
@@ -40,7 +42,7 @@ find -name CVS | xargs rm -rf
 %build
 %configure --enable-boehm=included --enable-threads=yes --with-clx
 make
-(cd build/doc; make all html)
+(cd build/doc; make all)
 
 
 %install
@@ -50,7 +52,7 @@ make DESTDIR=$RPM_BUILD_ROOT install
 rm -fr $RPM_BUILD_ROOT%{_infodir}/dir
 rm -fr $RPM_BUILD_ROOT%{_docdir}
 
-find $RPM_BUILD_ROOT%{_libdir}/ecl -name '*.lsp' | xargs chmod 0644
+find $RPM_BUILD_ROOT%{_libdir}/ecl* -name '*.lsp' | xargs chmod 0644
 
 %post
 /usr/sbin/semanage fcontext -a -t textrel_shlib_t "%{_libdir}/libecl.so" 2>/dev/null || :
@@ -79,8 +81,8 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %{_bindir}/ecl
 %{_bindir}/ecl-config
-%{_libdir}/ecl
-%{_libdir}/libecl.so
+%{_libdir}/ecl*
+%{_libdir}/libecl.so*
 %{_includedir}/ecl
 %{_mandir}/man*/*
 %{_infodir}/*
@@ -89,8 +91,8 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Tue Feb 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.9l-4
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
+* Tue Jun 16 2009 Gerard Milmeister <gemi@bluewin.ch> - 9.6.1-1
+- new release 9.6.1
 
 * Mon Oct  6 2008 Gerard Milmeister <gemi@bluewin.ch> - 0.9l-2
 - disable ppc64 (fails to build)

@@ -1,23 +1,22 @@
 Name:           ecl
-Version:        9.6.1
-Release:        2%{?dist}
+Version:        9.8.1
+Release:        1%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
 License:        LGPLv2+
 URL:            http://ecls.sourceforge.net
-Source0:	http://switch.dl.sourceforge.net/sourceforge/ecls/ecl-9.6.0.tgz
-Patch0:         ecl-9.6.1-mp.patch
+Source0:	http://switch.dl.sourceforge.net/sourceforge/ecls/ecl-9.8.1.tgz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:	libX11-devel
 BuildRequires:	m4
 BuildRequires:	texinfo
 BuildRequires:  texi2html
 BuildRequires:  gmp-devel
+BuildRequires:  gc-devel
 Requires:       gcc
 Requires(post): policycoreutils /sbin/install-info
 Requires(postun): policycoreutils /sbin/install-info
-ExcludeArch:    ppc64
 
 %description
 ECL (Embeddable Common-Lisp) is an interpreter of the Common-Lisp
@@ -31,7 +30,6 @@ to C, which can produce standalone executables.
 
 %prep
 %setup0 -q
-%patch0 -p1
 # wrong character in texinfo file
 sed -i 's|\xc7||g' src/doc/user.txi
 # set rpath to the final path
@@ -40,9 +38,9 @@ find -name CVS | xargs rm -rf
 
 
 %build
-%configure --enable-boehm=included --enable-threads=yes --with-clx
+%configure --enable-boehm=system --enable-threads=yes --with-clx
 make
-(cd build/doc; make all)
+(cd build/doc; make all )
 
 
 %install
@@ -55,8 +53,8 @@ rm -fr $RPM_BUILD_ROOT%{_docdir}
 find $RPM_BUILD_ROOT%{_libdir}/ecl* -name '*.lsp' | xargs chmod 0644
 
 %post
-/usr/sbin/semanage fcontext -a -t textrel_shlib_t "%{_libdir}/libecl.so" 2>/dev/null || :
-/sbin/restorecon "%{_libdir}/libecl.so" 2> /dev/null || :
+#/usr/sbin/semanage fcontext -a -t textrel_shlib_t "%{_libdir}/libecl.so" 2>/dev/null || :
+#/sbin/restorecon "%{_libdir}/libecl.so" 2> /dev/null || :
 /sbin/install-info %{_infodir}/ecl.info %{_infodir}/dir 2>/dev/null || :
 /sbin/install-info %{_infodir}/ecldev.info %{_infodir}/dir 2>/dev/null || :
 /sbin/install-info %{_infodir}/clx.info %{_infodir}/dir 2>/dev/null || :
@@ -65,7 +63,7 @@ find $RPM_BUILD_ROOT%{_libdir}/ecl* -name '*.lsp' | xargs chmod 0644
  
 %postun
 if [ $1 = 0 ]; then
-  /usr/sbin/semanage fcontext -d -t textrel_shlib_t "%{_libdir}/libecl.so" 2>/dev/null || :
+#  /usr/sbin/semanage fcontext -d -t textrel_shlib_t "%{_libdir}/libecl.so" 2>/dev/null || :
   /sbin/install-info --delete %{_infodir}/ecl.info %{_infodir}/dir 2>/dev/null || :
   /sbin/install-info --delete %{_infodir}/ecldev.info %{_infodir}/dir 2>/dev/null || :
   /sbin/install-info --delete %{_infodir}/clx.info %{_infodir}/dir 2>/dev/null || :

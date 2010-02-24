@@ -1,0 +1,112 @@
+--- src/c/ffi.d.orig	2010-02-13 12:04:32.000000000 -0700
++++ src/c/ffi.d	2010-02-24 12:39:31.552876214 -0700
+@@ -17,7 +17,7 @@
+ #include <ecl/ecl.h>
+ #include <ecl/internal.h>
+ #ifdef HAVE_LIBFFI
+-# include <ffi/ffi.h>
++# include <ffi.h>
+ #endif
+ 
+ static const cl_object ecl_foreign_type_table[] = {
+--- src/configure.orig	2010-02-24 12:39:08.082953933 -0700
++++ src/configure	2010-02-24 12:39:31.559078103 -0700
+@@ -9774,8 +9774,8 @@
+ 
+ if test $has_ffi_lib = yes; then
+   if test "${ac_cv_header_ffi_ffi_h+set}" = set; then
+-  { $as_echo "$as_me:$LINENO: checking for ffi/ffi.h" >&5
+-$as_echo_n "checking for ffi/ffi.h... " >&6; }
++  { $as_echo "$as_me:$LINENO: checking for ffi.h" >&5
++$as_echo_n "checking for ffi.h... " >&6; }
+ if test "${ac_cv_header_ffi_ffi_h+set}" = set; then
+   $as_echo_n "(cached) " >&6
+ fi
+@@ -9783,8 +9783,8 @@
+ $as_echo "$ac_cv_header_ffi_ffi_h" >&6; }
+ else
+   # Is the header compilable?
+-{ $as_echo "$as_me:$LINENO: checking ffi/ffi.h usability" >&5
+-$as_echo_n "checking ffi/ffi.h usability... " >&6; }
++{ $as_echo "$as_me:$LINENO: checking ffi.h usability" >&5
++$as_echo_n "checking ffi.h usability... " >&6; }
+ cat >conftest.$ac_ext <<_ACEOF
+ /* confdefs.h.  */
+ _ACEOF
+@@ -9792,7 +9792,7 @@
+ cat >>conftest.$ac_ext <<_ACEOF
+ /* end confdefs.h.  */
+ $ac_includes_default
+-#include <ffi/ffi.h>
++#include <ffi.h>
+ _ACEOF
+ rm -f conftest.$ac_objext
+ if { (ac_try="$ac_compile"
+@@ -9825,15 +9825,15 @@
+ $as_echo "$ac_header_compiler" >&6; }
+ 
+ # Is the header present?
+-{ $as_echo "$as_me:$LINENO: checking ffi/ffi.h presence" >&5
+-$as_echo_n "checking ffi/ffi.h presence... " >&6; }
++{ $as_echo "$as_me:$LINENO: checking ffi.h presence" >&5
++$as_echo_n "checking ffi.h presence... " >&6; }
+ cat >conftest.$ac_ext <<_ACEOF
+ /* confdefs.h.  */
+ _ACEOF
+ cat confdefs.h >>conftest.$ac_ext
+ cat >>conftest.$ac_ext <<_ACEOF
+ /* end confdefs.h.  */
+-#include <ffi/ffi.h>
++#include <ffi.h>
+ _ACEOF
+ if { (ac_try="$ac_cpp conftest.$ac_ext"
+ case "(($ac_try" in
+@@ -9867,30 +9867,30 @@
+ # So?  What about this header?
+ case $ac_header_compiler:$ac_header_preproc:$ac_c_preproc_warn_flag in
+   yes:no: )
+-    { $as_echo "$as_me:$LINENO: WARNING: ffi/ffi.h: accepted by the compiler, rejected by the preprocessor!" >&5
+-$as_echo "$as_me: WARNING: ffi/ffi.h: accepted by the compiler, rejected by the preprocessor!" >&2;}
+-    { $as_echo "$as_me:$LINENO: WARNING: ffi/ffi.h: proceeding with the compiler's result" >&5
+-$as_echo "$as_me: WARNING: ffi/ffi.h: proceeding with the compiler's result" >&2;}
++    { $as_echo "$as_me:$LINENO: WARNING: ffi.h: accepted by the compiler, rejected by the preprocessor!" >&5
++$as_echo "$as_me: WARNING: ffi.h: accepted by the compiler, rejected by the preprocessor!" >&2;}
++    { $as_echo "$as_me:$LINENO: WARNING: ffi.h: proceeding with the compiler's result" >&5
++$as_echo "$as_me: WARNING: ffi.h: proceeding with the compiler's result" >&2;}
+     ac_header_preproc=yes
+     ;;
+   no:yes:* )
+-    { $as_echo "$as_me:$LINENO: WARNING: ffi/ffi.h: present but cannot be compiled" >&5
+-$as_echo "$as_me: WARNING: ffi/ffi.h: present but cannot be compiled" >&2;}
+-    { $as_echo "$as_me:$LINENO: WARNING: ffi/ffi.h:     check for missing prerequisite headers?" >&5
+-$as_echo "$as_me: WARNING: ffi/ffi.h:     check for missing prerequisite headers?" >&2;}
+-    { $as_echo "$as_me:$LINENO: WARNING: ffi/ffi.h: see the Autoconf documentation" >&5
+-$as_echo "$as_me: WARNING: ffi/ffi.h: see the Autoconf documentation" >&2;}
+-    { $as_echo "$as_me:$LINENO: WARNING: ffi/ffi.h:     section \"Present But Cannot Be Compiled\"" >&5
+-$as_echo "$as_me: WARNING: ffi/ffi.h:     section \"Present But Cannot Be Compiled\"" >&2;}
+-    { $as_echo "$as_me:$LINENO: WARNING: ffi/ffi.h: proceeding with the preprocessor's result" >&5
+-$as_echo "$as_me: WARNING: ffi/ffi.h: proceeding with the preprocessor's result" >&2;}
+-    { $as_echo "$as_me:$LINENO: WARNING: ffi/ffi.h: in the future, the compiler will take precedence" >&5
+-$as_echo "$as_me: WARNING: ffi/ffi.h: in the future, the compiler will take precedence" >&2;}
++    { $as_echo "$as_me:$LINENO: WARNING: ffi.h: present but cannot be compiled" >&5
++$as_echo "$as_me: WARNING: ffi.h: present but cannot be compiled" >&2;}
++    { $as_echo "$as_me:$LINENO: WARNING: ffi.h:     check for missing prerequisite headers?" >&5
++$as_echo "$as_me: WARNING: ffi.h:     check for missing prerequisite headers?" >&2;}
++    { $as_echo "$as_me:$LINENO: WARNING: ffi.h: see the Autoconf documentation" >&5
++$as_echo "$as_me: WARNING: ffi.h: see the Autoconf documentation" >&2;}
++    { $as_echo "$as_me:$LINENO: WARNING: ffi.h:     section \"Present But Cannot Be Compiled\"" >&5
++$as_echo "$as_me: WARNING: ffi.h:     section \"Present But Cannot Be Compiled\"" >&2;}
++    { $as_echo "$as_me:$LINENO: WARNING: ffi.h: proceeding with the preprocessor's result" >&5
++$as_echo "$as_me: WARNING: ffi.h: proceeding with the preprocessor's result" >&2;}
++    { $as_echo "$as_me:$LINENO: WARNING: ffi.h: in the future, the compiler will take precedence" >&5
++$as_echo "$as_me: WARNING: ffi.h: in the future, the compiler will take precedence" >&2;}
+ 
+     ;;
+ esac
+-{ $as_echo "$as_me:$LINENO: checking for ffi/ffi.h" >&5
+-$as_echo_n "checking for ffi/ffi.h... " >&6; }
++{ $as_echo "$as_me:$LINENO: checking for ffi.h" >&5
++$as_echo_n "checking for ffi.h... " >&6; }
+ if test "${ac_cv_header_ffi_ffi_h+set}" = set; then
+   $as_echo_n "(cached) " >&6
+ else

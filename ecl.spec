@@ -1,44 +1,57 @@
 Name:           ecl
-Version:        9.8.1
+Version:        10.2.1
 Release:        1%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
-License:        LGPLv2+
-URL:            http://ecls.sourceforge.net
-Source0:	http://switch.dl.sourceforge.net/sourceforge/ecls/ecl-9.8.1.tgz
+License:        LGPLv2+ and BSD and MIT and Public Domain
+URL:            http://ecls.sourceforge.net/
+Source0:        http://downloads.sourceforge.net/project/ecls/ecls/10.2/ecl-%{version}.tgz
+# This patch has not yet been sent upstream.  It fixes a malformed test for
+# sem_init() that causes the test to fail spuriously.
+Patch0:         ecl-10.2.1-semaphore.patch
+# This patch has not yet been sent upstream.  The code assumes that all libffi
+# headers are in a directory named "ffi".  On Fedora, they are not.
+Patch1:         ecl-10.2.1-ffi.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildRequires:	libX11-devel
-BuildRequires:	m4
-BuildRequires:	texinfo
-BuildRequires:  texi2html
+BuildRequires:  libX11-devel
+BuildRequires:  pkgconfig
+BuildRequires:  texinfo
 BuildRequires:  gmp-devel
 BuildRequires:  gc-devel
+BuildRequires:  libffi-devel
 Requires:       gcc
-Requires(post): policycoreutils /sbin/install-info
-Requires(postun): policycoreutils /sbin/install-info
+Requires(post): info
+Requires(postun): info
 
 %description
-ECL (Embeddable Common-Lisp) is an interpreter of the Common-Lisp
-language as described in the X3J13 Ansi specification, featuring CLOS
-(Common-Lisp Object System), conditions, loops, etc, plus a translator
-to C, which can produce standalone executables.
+ECL (Embeddable Common Lisp) is an implementation of the Common Lisp
+language as defined by the ANSI X3J13 specification.  ECL features a
+bytecode compiler and interpreter, the ability to build standalone
+executables and libraries, and extensions such as ASDF, sockets, and
+Gray streams.
 
 # no -devel package for header files is split off
 # since they are required by the main package
 
 
 %prep
-%setup0 -q
-# wrong character in texinfo file
-sed -i 's|\xc7||g' src/doc/user.txi
-# set rpath to the final path
-sed -i 's|-Wl,--rpath,~A|-Wl,--rpath,%{_libdir}/ecl|g' src/configure
-find -name CVS | xargs rm -rf
+%setup -q
+%patch0
+%patch1
+
+# Remove spurious executable bits
+chmod a-x src/CHANGELOG
+find src/c -type f -perm /0111 | xargs chmod a-x
+find src/h -type f -perm /0111 | xargs chmod a-x
 
 
 %build
-%configure --enable-boehm=system --enable-threads=yes --with-clx
+%configure --enable-boehm=system --enable-gengc --enable-unicode \
+  --enable-longdouble --enable-c99complex \
+  --enable-threads=yes --with-__thread --with-clx \
+  CPPFLAGS=`pkg-config --cflags libffi` \
+  CFLAGS="${RPM_OPT_FLAGS} -fno-strict-aliasing"
 make
 (cd build/doc; make all )
 
@@ -50,11 +63,12 @@ make DESTDIR=$RPM_BUILD_ROOT install
 rm -fr $RPM_BUILD_ROOT%{_infodir}/dir
 rm -fr $RPM_BUILD_ROOT%{_docdir}
 
-find $RPM_BUILD_ROOT%{_libdir}/ecl* -name '*.lsp' | xargs chmod 0644
+# Add missing executable bits
+chmod a+x $RPM_BUILD_ROOT%{_libdir}/ecl-%{version}/dpp
+chmod a+x $RPM_BUILD_ROOT%{_libdir}/ecl-%{version}/ecl_min
+
 
 %post
-#/usr/sbin/semanage fcontext -a -t textrel_shlib_t "%{_libdir}/libecl.so" 2>/dev/null || :
-#/sbin/restorecon "%{_libdir}/libecl.so" 2> /dev/null || :
 /sbin/install-info %{_infodir}/ecl.info %{_infodir}/dir 2>/dev/null || :
 /sbin/install-info %{_infodir}/ecldev.info %{_infodir}/dir 2>/dev/null || :
 /sbin/install-info %{_infodir}/clx.info %{_infodir}/dir 2>/dev/null || :
@@ -63,7 +77,6 @@ find $RPM_BUILD_ROOT%{_libdir}/ecl* -name '*.lsp' | xargs chmod 0644
  
 %postun
 if [ $1 = 0 ]; then
-#  /usr/sbin/semanage fcontext -d -t textrel_shlib_t "%{_libdir}/libecl.so" 2>/dev/null || :
   /sbin/install-info --delete %{_infodir}/ecl.info %{_infodir}/dir 2>/dev/null || :
   /sbin/install-info --delete %{_infodir}/ecldev.info %{_infodir}/dir 2>/dev/null || :
   /sbin/install-info --delete %{_infodir}/clx.info %{_infodir}/dir 2>/dev/null || :
@@ -84,11 +97,14 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ecl
 %{_mandir}/man*/*
 %{_infodir}/*
-%doc ANNOUNCEMENT Copyright LGPL
-%doc examples
+%doc ANNOUNCEMENT Copyright LGPL examples
+%doc src/CHANGELOG src/doc/todo.txt src/doc/tutorial.txt
 
 
 %changelog
+* Wed Feb 24 2010 Jerry James <loganjerry@gmail.com> - 10.2.1-1
+- New release 10.2.1
+
 * Sun Aug  9 2009 Gerard Milmeister <gemi@bluewin.ch> - 9.8.1-1
 - new release 9.8.1
 

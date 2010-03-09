@@ -1,5 +1,5 @@
---- src/c/ffi.d.orig	2010-02-13 12:04:32.000000000 -0700
-+++ src/c/ffi.d	2010-02-24 12:39:31.552876214 -0700
+--- src/c/ffi.d.orig	2010-03-05 07:00:36.000000000 -0700
++++ src/c/ffi.d	2010-03-09 09:22:09.411073031 -0700
 @@ -17,7 +17,7 @@
  #include <ecl/ecl.h>
  #include <ecl/internal.h>
@@ -9,9 +9,9 @@
  #endif
  
  static const cl_object ecl_foreign_type_table[] = {
---- src/configure.orig	2010-02-24 12:39:08.082953933 -0700
-+++ src/configure	2010-02-24 12:39:31.559078103 -0700
-@@ -9774,8 +9774,8 @@
+--- src/configure.orig	2010-03-09 09:21:00.484055524 -0700
++++ src/configure	2010-03-09 09:22:09.417071020 -0700
+@@ -9775,8 +9775,8 @@
  
  if test $has_ffi_lib = yes; then
    if test "${ac_cv_header_ffi_ffi_h+set}" = set; then
@@ -22,7 +22,7 @@
  if test "${ac_cv_header_ffi_ffi_h+set}" = set; then
    $as_echo_n "(cached) " >&6
  fi
-@@ -9783,8 +9783,8 @@
+@@ -9784,8 +9784,8 @@
  $as_echo "$ac_cv_header_ffi_ffi_h" >&6; }
  else
    # Is the header compilable?
@@ -33,7 +33,7 @@
  cat >conftest.$ac_ext <<_ACEOF
  /* confdefs.h.  */
  _ACEOF
-@@ -9792,7 +9792,7 @@
+@@ -9793,7 +9793,7 @@
  cat >>conftest.$ac_ext <<_ACEOF
  /* end confdefs.h.  */
  $ac_includes_default
@@ -42,7 +42,7 @@
  _ACEOF
  rm -f conftest.$ac_objext
  if { (ac_try="$ac_compile"
-@@ -9825,15 +9825,15 @@
+@@ -9826,15 +9826,15 @@
  $as_echo "$ac_header_compiler" >&6; }
  
  # Is the header present?
@@ -61,7 +61,7 @@
  _ACEOF
  if { (ac_try="$ac_cpp conftest.$ac_ext"
  case "(($ac_try" in
-@@ -9867,30 +9867,30 @@
+@@ -9868,30 +9868,30 @@
  # So?  What about this header?
  case $ac_header_compiler:$ac_header_preproc:$ac_c_preproc_warn_flag in
    yes:no: )

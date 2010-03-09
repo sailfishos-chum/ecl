@@ -1,18 +1,20 @@
 Name:           ecl
-Version:        10.2.1
+Version:        10.3.1
 Release:        1%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
 License:        LGPLv2+ and BSD and MIT and Public Domain
 URL:            http://ecls.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/project/ecls/ecls/10.2/ecl-%{version}.tgz
-# This patch has not yet been sent upstream.  It fixes a malformed test for
-# sem_init() that causes the test to fail spuriously.
-Patch0:         ecl-10.2.1-semaphore.patch
+Source0:        http://downloads.sourceforge.net/project/ecls/ecls/10.3/ecl-%{version}.tgz
+# This patch was sent upstream on 9 Mar 2010.  (Actually, the equivalent patch
+# to src/aclocal.m4 was sent upstream; this patch is to src/configure.)  The
+# patch fixes a malformed test for sem_init() that causes the test to fail
+# spuriously.
+Patch0:         ecl-10.3.1-semaphore.patch
 # This patch has not yet been sent upstream.  The code assumes that all libffi
 # headers are in a directory named "ffi".  On Fedora, they are not.
-Patch1:         ecl-10.2.1-ffi.patch
+Patch1:         ecl-10.3.1-ffi.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  libX11-devel
 BuildRequires:  pkgconfig
@@ -102,6 +104,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Tue Mar  9 2010 Jerry James <loganjerry@gmail.com> - 10.3.1-1
+- New release 10.3.1
+
 * Wed Feb 24 2010 Jerry James <loganjerry@gmail.com> - 10.2.1-1
 - New release 10.2.1
 

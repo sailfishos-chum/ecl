@@ -1,27 +1,34 @@
 Name:           ecl
-Version:        10.3.1
+Version:        10.4.1
 Release:        1%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
 License:        LGPLv2+ and BSD and MIT and Public Domain
 URL:            http://ecls.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/project/ecls/ecls/10.3/ecl-%{version}.tgz
-# This patch was sent upstream on 9 Mar 2010.  (Actually, the equivalent patch
-# to src/aclocal.m4 was sent upstream; this patch is to src/configure.)  The
-# patch fixes a malformed test for sem_init() that causes the test to fail
-# spuriously.
-Patch0:         ecl-10.3.1-semaphore.patch
+Source0:        http://downloads.sourceforge.net/project/ecls/ecls/10.4/ecl-%{version}.tar.gz
+# The manual has not yet been released.  Use the following commands to generate
+# the manual tarball:
+#   git clone git://ecls.git.sourceforge.net/gitroot/ecls/ecl-doc
+#   cd ecl-doc
+#   git checkout a70a56aedbfad1cc26ffe6f4783e37c2a4e5c0b4
+#   rm -fr .git
+#   cd ..
+#   tar cf ecl-doc.tar ecl-doc
+#   xz ecl-doc.tar
+Source1:        ecl-doc.tar.xz
 # This patch has not yet been sent upstream.  The code assumes that all libffi
 # headers are in a directory named "ffi".  On Fedora, they are not.
-Patch1:         ecl-10.3.1-ffi.patch
+Patch0:         ecl-10.4.1-ffi.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  libX11-devel
 BuildRequires:  pkgconfig
-BuildRequires:  texinfo
 BuildRequires:  gmp-devel
 BuildRequires:  gc-devel
 BuildRequires:  libffi-devel
+BuildRequires:  emacs-common
+BuildRequires:  docbook-dtds
+BuildRequires:  xmlto
 Requires:       gcc
 Requires(post): info
 Requires(postun): info
@@ -39,8 +46,8 @@ Gray streams.
 
 %prep
 %setup -q
+%setup -q -T -D -a 1
 %patch0
-%patch1
 
 # Remove spurious executable bits
 chmod a-x src/CHANGELOG
@@ -49,41 +56,38 @@ find src/h -type f -perm /0111 | xargs chmod a-x
 
 
 %build
-%configure --enable-boehm=system --enable-gengc --enable-unicode \
-  --enable-longdouble --enable-c99complex \
-  --enable-threads=yes --with-__thread --with-clx \
+%configure --enable-boehm=system --enable-unicode --enable-longdouble \
+  --enable-c99complex --enable-threads=yes --with-__thread --with-clx \
   CPPFLAGS=`pkg-config --cflags libffi` \
   CFLAGS="${RPM_OPT_FLAGS} -fno-strict-aliasing"
 make
-(cd build/doc; make all )
+make -C ecl-doc
 
 
 %install
 rm -rf $RPM_BUILD_ROOT
 make DESTDIR=$RPM_BUILD_ROOT install
-(cd build/doc; make DESTDIR=$RPM_BUILD_ROOT install)
-rm -fr $RPM_BUILD_ROOT%{_infodir}/dir
+
+# Remove installed files that are in the wrong place
 rm -fr $RPM_BUILD_ROOT%{_docdir}
+rm -f $RPM_BUILD_ROOT%{_libdir}/Copyright
+rm -f $RPM_BUILD_ROOT%{_libdir}/LGPL
+
+# Install the man pages
+mkdir -p $RPM_BUILD_ROOT%{_mandir}/man1
+sed -e "s|@bindir@|%{_bindir}|" src/doc/ecl.man.in > \
+  $RPM_BUILD_ROOT%{_mandir}/man1/ecl.1
+cp -p src/doc/ecl-config.man.in $RPM_BUILD_ROOT%{_mandir}/man1/ecl-config.1
 
 # Add missing executable bits
 chmod a+x $RPM_BUILD_ROOT%{_libdir}/ecl-%{version}/dpp
 chmod a+x $RPM_BUILD_ROOT%{_libdir}/ecl-%{version}/ecl_min
 
 
-%post
-/sbin/install-info %{_infodir}/ecl.info %{_infodir}/dir 2>/dev/null || :
-/sbin/install-info %{_infodir}/ecldev.info %{_infodir}/dir 2>/dev/null || :
-/sbin/install-info %{_infodir}/clx.info %{_infodir}/dir 2>/dev/null || :
-/sbin/ldconfig
+%post -p /sbin/ldconfig
 
  
-%postun
-if [ $1 = 0 ]; then
-  /sbin/install-info --delete %{_infodir}/ecl.info %{_infodir}/dir 2>/dev/null || :
-  /sbin/install-info --delete %{_infodir}/ecldev.info %{_infodir}/dir 2>/dev/null || :
-  /sbin/install-info --delete %{_infodir}/clx.info %{_infodir}/dir 2>/dev/null || :
-fi
-/sbin/ldconfig
+%postun -p /sbin/ldconfig
 
 
 %clean
@@ -97,13 +101,17 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/ecl*
 %{_libdir}/libecl.so*
 %{_includedir}/ecl
-%{_mandir}/man*/*
-%{_infodir}/*
-%doc ANNOUNCEMENT Copyright LGPL examples
-%doc src/CHANGELOG src/doc/todo.txt src/doc/tutorial.txt
+%{_mandir}/man1/*
+%doc ANNOUNCEMENT Copyright LGPL examples src/CHANGELOG
+%doc ecl-doc/ecl.css ecl-doc/html
 
 
 %changelog
+* Mon Apr 12 2010 Jerry James <loganjerry@gmail.com> - 10.4.1-1
+- New release 10.4.1
+- Drop upstreamed semaphore patch
+- Add manual built from ecl-doc sources, replaces info documentation
+
 * Tue Mar  9 2010 Jerry James <loganjerry@gmail.com> - 10.3.1-1
 - New release 10.3.1
 

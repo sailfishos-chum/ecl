@@ -1,6 +1,6 @@
 Name:           ecl
 Version:        10.4.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
@@ -107,6 +107,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Tue Feb 08 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 10.4.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
+
 * Mon Apr 12 2010 Jerry James <loganjerry@gmail.com> - 10.4.1-1
 - New release 10.4.1
 - Drop upstreamed semaphore patch

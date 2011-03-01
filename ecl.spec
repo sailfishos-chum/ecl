@@ -1,37 +1,48 @@
 Name:           ecl
-Version:        10.4.1
-Release:        2%{?dist}
+Version:        11.1.1
+Release:        1%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
 License:        LGPLv2+ and BSD and MIT and Public Domain
 URL:            http://ecls.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/project/ecls/ecls/10.4/ecl-%{version}.tar.gz
+Source0:        http://downloads.sourceforge.net/project/ecls/ecls/11.1/ecl-%{version}.tar.gz
 # The manual has not yet been released.  Use the following commands to generate
 # the manual tarball:
 #   git clone git://ecls.git.sourceforge.net/gitroot/ecls/ecl-doc
 #   cd ecl-doc
-#   git checkout a70a56aedbfad1cc26ffe6f4783e37c2a4e5c0b4
+#   git checkout 04798a28d55c5ec096af5976f0ceef663f4d717b
 #   rm -fr .git
 #   cd ..
 #   tar cf ecl-doc.tar ecl-doc
 #   xz ecl-doc.tar
 Source1:        ecl-doc.tar.xz
-# This patch has not yet been sent upstream.  The code assumes that all libffi
-# headers are in a directory named "ffi".  On Fedora, they are not.
-Patch0:         ecl-10.4.1-ffi.patch
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+Source2:        ecl.desktop
+# A modified version of src/util/ecl.svg with extra whitespace removed.  The
+# extra whitespace made the icon appear very small and shoved into a corner.
+Source3:        ecl.svg
+# This patch was accepted upstream on 9 Jan 2011.  It fixes a few autoconf
+# constructs that are broken for Fedora, and also avoids building
+# libatomic_ops from source.
+Patch0:         ecl-11.1.1-configure.patch
+# This patch was accepted upstream on 21 Jan 2011.  It fixes a few warnings
+# from the C compiler that indicate situations that might be dangerous at
+# runtime.
+Patch1:         ecl-11.1.1-warnings.patch
+
 BuildRequires:  libX11-devel
 BuildRequires:  pkgconfig
 BuildRequires:  gmp-devel
 BuildRequires:  gc-devel
 BuildRequires:  libffi-devel
+BuildRequires:  libatomic_ops-devel
 BuildRequires:  emacs-common
 BuildRequires:  docbook-dtds
 BuildRequires:  xmlto
+BuildRequires:  desktop-file-utils
 Requires:       gcc
-Requires(post): info
-Requires(postun): info
+Requires(post): coreutils, desktop-file-utils, gtk2
+Requires(postun): coreutils, desktop-file-utils, gtk2
 
 %description
 ECL (Embeddable Common Lisp) is an implementation of the Common Lisp
@@ -48,6 +59,7 @@ Gray streams.
 %setup -q
 %setup -q -T -D -a 1
 %patch0
+%patch1 -p1
 
 # Remove spurious executable bits
 chmod a-x src/CHANGELOG
@@ -56,10 +68,12 @@ find src/h -type f -perm /0111 | xargs chmod a-x
 
 
 %build
-%configure --enable-boehm=system --enable-unicode --enable-longdouble \
-  --enable-c99complex --enable-threads=yes --with-__thread --with-clx \
-  CPPFLAGS=`pkg-config --cflags libffi` \
-  CFLAGS="${RPM_OPT_FLAGS} -fno-strict-aliasing"
+%configure --enable-unicode --enable-c99complex --enable-rpath=no \
+  --enable-threads=yes --with-__thread --with-clx \
+%ifarch x86_64
+  --with-sse \
+%endif
+  CPPFLAGS=`pkg-config --cflags libffi` CFLAGS="${RPM_OPT_FLAGS}"
 make
 make -C ecl-doc
 
@@ -83,11 +97,31 @@ cp -p src/doc/ecl-config.man.in $RPM_BUILD_ROOT%{_mandir}/man1/ecl-config.1
 chmod a+x $RPM_BUILD_ROOT%{_libdir}/ecl-%{version}/dpp
 chmod a+x $RPM_BUILD_ROOT%{_libdir}/ecl-%{version}/ecl_min
 
+# Install the desktop file
+desktop-file-install --dir=$RPM_BUILD_ROOT%{_datadir}/applications %{SOURCE2}
 
-%post -p /sbin/ldconfig
+# Install the desktop icon
+mkdir -p $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/scalable/apps
+cp -p %{SOURCE3} $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/scalable/apps
+
+
+%post
+update-desktop-database -q >&/dev/null ||:
+touch --no-create %{_datadir}/icons/hicolor
 
  
-%postun -p /sbin/ldconfig
+%postun
+/sbin/ldconfig
+update-desktop-database -q >&/dev/null ||:
+if [ $1 -eq 0 ]; then
+  touch --no-create %{_datadir}/icons/hicolor
+  gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
+fi
+
+
+%posttrans
+/sbin/ldconfig
+gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
 
 
 %clean
@@ -98,15 +132,25 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %{_bindir}/ecl
 %{_bindir}/ecl-config
+%{_datadir}/applications/ecl.desktop
+%{_datadir}/icons/hicolor/scalable/apps/ecl.svg
 %{_libdir}/ecl*
 %{_libdir}/libecl.so*
 %{_includedir}/ecl
 %{_mandir}/man1/*
 %doc ANNOUNCEMENT Copyright LGPL examples src/CHANGELOG
-%doc ecl-doc/ecl.css ecl-doc/html
+%doc ecl-doc/ecl.css ecl-doc/html src/doc/amop.txt src/doc/types-and-classes
 
 
 %changelog
+* Tue Mar  1 2011 Jerry James <loganjerry@gmail.com> - 11.1.1-1
+- New release 11.1.1
+- Drop libffi patch (fixed upstream)
+- Add -configure and -warnings patches
+- Add SSE2 support on x86_64
+- Disable rpath explicitly, as it is now enabled by default
+- Add desktop file and icon
+
 * Tue Feb 08 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 10.4.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 

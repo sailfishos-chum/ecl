@@ -1,0 +1,496 @@
+diff -durpN ecl-11.1.1.ORIG/src/c/assignment.d ecl-11.1.1/src/c/assignment.d
+--- ecl-11.1.1.ORIG/src/c/assignment.d	2011-01-16 14:39:56.000000000 -0700
++++ ecl-11.1.1/src/c/assignment.d	2011-01-17 17:13:42.089782052 -0700
+@@ -116,7 +116,6 @@ ecl_clear_compiler_properties(cl_object 
+ cl_object
+ si_get_sysprop(cl_object sym, cl_object prop)
+ {
+-	cl_env_ptr the_env = ecl_process_env();
+ 	cl_object plist = ecl_gethash_safe(sym, cl_core.system_properties, Cnil);
+ 	prop = ecl_getf(plist, prop, OBJNULL);
+ 	if (prop == OBJNULL) {
+diff -durpN ecl-11.1.1.ORIG/src/c/cfun.d ecl-11.1.1/src/c/cfun.d
+--- ecl-11.1.1.ORIG/src/c/cfun.d	2011-01-16 14:39:56.000000000 -0700
++++ ecl-11.1.1/src/c/cfun.d	2011-01-17 17:04:08.347278978 -0700
+@@ -204,7 +204,7 @@ si_compiled_function_file(cl_object b)
+ 	}
+ }
+ 
+-cl_object
++void
+ ecl_set_function_source_file_info(cl_object b, cl_object source, cl_object position)
+ {
+ 	cl_env_ptr the_env = ecl_process_env();
+diff -durpN ecl-11.1.1.ORIG/src/c/cfun_dispatch.d ecl-11.1.1/src/c/cfun_dispatch.d
+--- ecl-11.1.1.ORIG/src/c/cfun_dispatch.d	2011-01-16 14:39:56.000000000 -0700
++++ ecl-11.1.1/src/c/cfun_dispatch.d	2011-01-17 17:02:24.906531522 -0700
+@@ -451,13 +451,6 @@ static cl_object dispatch63 (cl_narg nar
+   return fun->cfunfixed.entry_fixed(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62);
+ }
+ 
+-static cl_object dispatch64 (cl_narg narg, cl_object x0, cl_object x1, cl_object x2, cl_object x3, cl_object x4, cl_object x5, cl_object x6, cl_object x7, cl_object x8, cl_object x9, cl_object x10, cl_object x11, cl_object x12, cl_object x13, cl_object x14, cl_object x15, cl_object x16, cl_object x17, cl_object x18, cl_object x19, cl_object x20, cl_object x21, cl_object x22, cl_object x23, cl_object x24, cl_object x25, cl_object x26, cl_object x27, cl_object x28, cl_object x29, cl_object x30, cl_object x31, cl_object x32, cl_object x33, cl_object x34, cl_object x35, cl_object x36, cl_object x37, cl_object x38, cl_object x39, cl_object x40, cl_object x41, cl_object x42, cl_object x43, cl_object x44, cl_object x45, cl_object x46, cl_object x47, cl_object x48, cl_object x49, cl_object x50, cl_object x51, cl_object x52, cl_object x53, cl_object x54, cl_object x55, cl_object x56, cl_object x57, cl_object x58, cl_object x59, cl_object x60, cl_object x61, cl_object x62, cl_object x63) {
+-  const cl_env_ptr the_env = ecl_process_env();
+-  cl_object fun = the_env->function;
+-  if (ecl_unlikely(narg != 64)) FEwrong_num_arguments(fun);
+-  return fun->cfunfixed.entry_fixed(x0, x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17, x18, x19, x20, x21, x22, x23, x24, x25, x26, x27, x28, x29, x30, x31, x32, x33, x34, x35, x36, x37, x38, x39, x40, x41, x42, x43, x44, x45, x46, x47, x48, x49, x50, x51, x52, x53, x54, x55, x56, x57, x58, x59, x60, x61, x62, x63);
+-}
+-
+ static cl_objectfn dispatch_table[64] = {
+ (cl_objectfn)dispatch0, 
+ (cl_objectfn)dispatch1, 
+diff -durpN ecl-11.1.1.ORIG/src/c/char_ctype.d ecl-11.1.1/src/c/char_ctype.d
+--- ecl-11.1.1.ORIG/src/c/char_ctype.d	2011-01-16 14:39:56.000000000 -0700
++++ ecl-11.1.1/src/c/char_ctype.d	2011-01-17 16:39:30.837515608 -0700
+@@ -82,12 +82,14 @@ ucd_value_0(ecl_character code)
+ 
+ #define read_3bytes(c) c[0] + (c[1] << 8) + (c[2] << 16)
+ 
++#if 0
+ static ecl_character
+ ucd_value_1(ecl_character code)
+ {
+ 	uint8_t *c = ucd_char_data(code);
+ 	return read_3bytes(c);
+ }
++#endif
+ 
+ static int
+ ucd_general_category(ecl_character code)
+diff -durpN ecl-11.1.1.ORIG/src/c/compiler.d ecl-11.1.1/src/c/compiler.d
+--- ecl-11.1.1.ORIG/src/c/compiler.d	2011-01-16 14:39:56.000000000 -0700
++++ ecl-11.1.1/src/c/compiler.d	2011-01-17 16:31:46.980655947 -0700
+@@ -2490,7 +2490,6 @@ si_process_lambda_list(cl_object org_lam
+ #define AT_KEYS		3
+ #define AT_OTHER_KEYS	4
+ #define AT_AUXS		5
+-	const cl_env_ptr the_env = ecl_process_env();
+ 	cl_object v, key, init, spp, lambda_list = org_lambda_list;
+ 	cl_object reqs = Cnil, opts = Cnil, keys = Cnil, rest = Cnil, auxs = Cnil;
+ 	int nreq = 0, nopt = 0, nkey = 0, naux = 0, stage = 0;
+@@ -2830,7 +2829,7 @@ si_valid_function_name_p(cl_object name)
+ cl_object
+ si_make_lambda(cl_object name, cl_object rest)
+ {
+-	cl_object lambda;
++	cl_object lambda = Cnil;
+         const cl_env_ptr the_env = ecl_process_env();
+ 	volatile cl_compiler_env_ptr old_c_env = the_env->c_env;
+ 	struct cl_compiler_env new_c_env;
+@@ -2849,7 +2848,7 @@ si_make_lambda(cl_object name, cl_object
+ 	volatile cl_compiler_env_ptr old_c_env;
+ 	struct cl_compiler_env new_c_env;
+ 	volatile cl_index handle;
+-	cl_object bytecodes, interpreter_env, compiler_env;
++	cl_object bytecodes = Cnil, interpreter_env, compiler_env;
+ @
+ 	/*
+ 	 * Compile to bytecodes.
+diff -durpN ecl-11.1.1.ORIG/src/c/disassembler.d ecl-11.1.1/src/c/disassembler.d
+--- ecl-11.1.1.ORIG/src/c/disassembler.d	2011-01-16 14:39:56.000000000 -0700
++++ ecl-11.1.1/src/c/disassembler.d	2011-01-17 16:32:12.667094449 -0700
+@@ -614,7 +614,6 @@ si_bc_disassemble(cl_object v)
+ cl_object
+ si_bc_split(cl_object b)
+ {
+-	const cl_env_ptr the_env = ecl_process_env();
+ 	cl_object vector;
+ 	cl_object data;
+ 	cl_object lex = Cnil;
+diff -durpN ecl-11.1.1.ORIG/src/c/ffi/libraries.d ecl-11.1.1/src/c/ffi/libraries.d
+--- ecl-11.1.1.ORIG/src/c/ffi/libraries.d	2011-01-16 14:39:56.000000000 -0700
++++ ecl-11.1.1/src/c/ffi/libraries.d	2011-01-17 17:11:26.346739168 -0700
+@@ -191,7 +191,7 @@ static cl_object
+ ecl_library_open_inner(cl_object filename, bool self_destruct)
+ {
+         const cl_env_ptr the_env = ecl_process_env();
+-	cl_object other, block = ecl_alloc_object(t_codeblock);
++	cl_object block = ecl_alloc_object(t_codeblock);
+ 	block->cblock.self_destruct = self_destruct;
+ 	block->cblock.locked = 0;
+ 	block->cblock.handle = NULL;
+@@ -237,7 +237,6 @@ cl_object
+ ecl_library_open(cl_object filename, bool force_reload) {
+ 	cl_object block;
+ 	bool self_destruct = 0;
+-	char *filename_string;
+ 
+ 	/* Coerces to a file name but does not merge with cwd */
+ 	filename = coerce_to_physical_pathname(filename);
+@@ -409,7 +408,6 @@ ecl_library_close(cl_object block) {
+                 ecl_enable_interrupts();
+         } ECL_WITH_GLOBAL_LOCK_END;
+ 	if (block != Cnil && block->cblock.self_destruct) {
+-                const char *filename;
+                 if (!Null(block->cblock.name)) {
+                         unlink((char*)block->cblock.name->base_string.self);
+                 }
+diff -durpN ecl-11.1.1.ORIG/src/c/file.d ecl-11.1.1/src/c/file.d
+--- ecl-11.1.1.ORIG/src/c/file.d	2011-01-16 14:39:56.000000000 -0700
++++ ecl-11.1.1/src/c/file.d	2011-01-17 16:51:59.574145259 -0700
+@@ -1110,7 +1110,7 @@ utf_8_encoder(cl_object stream, unsigned
+ {
+ 	int nbytes;
+ 	if (c < 0) {
+-		return 0;
++		nbytes = 0;
+ 	} else if (c <= 0x7F) {
+ 		buffer[0] = c;
+ 		nbytes = 1;
+@@ -1130,6 +1130,8 @@ utf_8_encoder(cl_object stream, unsigned
+ 		buffer[1] = (c & 0x3f) | 0x80; c >>= 6;
+ 		buffer[0] = c | 0xF0;
+ 		nbytes = 4;
++	} else {
++		nbytes = 0;
+ 	}
+ 	return nbytes;
+ }
+@@ -4686,7 +4688,7 @@ file_listen(int fileno)
+ #if !defined(ECL_MS_WINDOWS_HOST)
+ # if defined(HAVE_SELECT)
+ 	fd_set fds;
+-	int retv, fd;
++	int retv;
+ 	struct timeval tv = { 0, 0 };
+         /*
+          * Note that the following code is fragile. If the file is closed (/dev/null)
+diff -durpN ecl-11.1.1.ORIG/src/c/gfun.d ecl-11.1.1/src/c/gfun.d
+--- ecl-11.1.1.ORIG/src/c/gfun.d	2011-01-16 14:39:56.000000000 -0700
++++ ecl-11.1.1/src/c/gfun.d	2011-01-17 16:36:09.986906531 -0700
+@@ -110,7 +110,7 @@ si_generic_function_p(cl_object x)
+ #define RECORD_GEN(e) fix((e+2)[0])
+ #define RECORD_GEN_SET(e,v) ((e+2)[0]=MAKE_FIXNUM(v))
+ 
+-static cl_object
++static void
+ do_clear_method_hash(struct cl_env_struct *env, cl_object target)
+ {
+ 	cl_object table = env->method_hash;
+@@ -182,6 +182,7 @@ si_clear_gfun_hash(cl_object what)
+ #else
+ 	do_clear_method_hash(&cl_env, what);
+ #endif
++	@(return);
+ }
+ 
+ static cl_index
+diff -durpN ecl-11.1.1.ORIG/src/c/interpreter.d ecl-11.1.1/src/c/interpreter.d
+--- ecl-11.1.1.ORIG/src/c/interpreter.d	2011-01-16 14:39:56.000000000 -0700
++++ ecl-11.1.1/src/c/interpreter.d	2011-01-17 16:28:15.163286066 -0700
+@@ -271,7 +271,7 @@ ecl_interpret(cl_object frame, cl_object
+         volatile cl_index frame_index = 0;
+ 	cl_opcode *vector = (cl_opcode*)bytecodes->bytecodes.code;
+ 	cl_object *data = bytecodes->bytecodes.data;
+-	cl_object reg0, reg1, lex_env = env;
++	cl_object reg0 = OBJNULL, reg1 = OBJNULL, lex_env = env;
+ 	cl_index narg;
+ 	struct ecl_stack_frame frame_aux;
+ 	volatile struct ihs_frame ihs;
+@@ -284,7 +284,6 @@ ecl_interpret(cl_object frame, cl_object
+ 	frame_aux.stack = frame_aux.base = 0;
+         frame_aux.size = 0;
+         frame_aux.env = the_env;
+- BEGIN:
+ 	BEGIN_SWITCH {
+ 	CASE(OP_NOP); {
+ 		reg0 = Cnil;
+diff -durpN ecl-11.1.1.ORIG/src/c/main.d ecl-11.1.1/src/c/main.d
+--- ecl-11.1.1.ORIG/src/c/main.d	2011-01-16 14:39:57.000000000 -0700
++++ ecl-11.1.1/src/c/main.d	2011-01-17 16:01:26.847464458 -0700
+@@ -270,7 +270,7 @@ read_char_database()
+ 						 si_get_library_pathname(),
+ 						 make_constant_base_string("ucd.dat"));
+ 	cl_object output = Cnil;
+-	FILE *f = fopen(s->base_string.self, "rb");
++	FILE *f = fopen((const char *)s->base_string.self, "rb");
+ 	if (f) {
+ 		cl_index size, read;
+ 		if (!fseek(f, 0, SEEK_END)) {
+@@ -817,7 +817,6 @@ si_getenv(cl_object var)
+ cl_object
+ si_setenv(cl_object var, cl_object value)
+ {
+-	const cl_env_ptr the_env = ecl_process_env();
+ 	cl_fixnum ret_val;
+ 
+ 	/* Strings have to be null terminated base strings */
+@@ -882,7 +881,6 @@ si_environ(void)
+ cl_object
+ si_pointer(cl_object x)
+ {
+-	const cl_env_ptr the_env = ecl_process_env();
+ 	@(return ecl_make_unsigned_integer((cl_index)x))
+ }
+ 
+diff -durpN ecl-11.1.1.ORIG/src/c/numbers/expt.d ecl-11.1.1/src/c/numbers/expt.d
+--- ecl-11.1.1.ORIG/src/c/numbers/expt.d	2011-01-16 14:39:57.000000000 -0700
++++ ecl-11.1.1/src/c/numbers/expt.d	2011-01-17 17:12:46.580991324 -0700
+@@ -81,7 +81,7 @@ expt_zero(cl_object x, cl_object y)
+                 return ecl_make_complex(z, MAKE_FIXNUM(0));
+         default:
+                 /* We will never reach this */
+-                (void)0;
++                return OBJNULL;
+         }
+ }
+ 
+diff -durpN ecl-11.1.1.ORIG/src/c/package.d ecl-11.1.1/src/c/package.d
+--- ecl-11.1.1.ORIG/src/c/package.d	2011-01-16 14:39:57.000000000 -0700
++++ ecl-11.1.1/src/c/package.d	2011-01-17 16:19:39.225562793 -0700
+@@ -195,7 +195,7 @@ cl_object
+ ecl_make_package(cl_object name, cl_object nicknames, cl_object use_list)
+ {
+         const cl_env_ptr env = ecl_process_env();
+-	cl_object x, l, other = Cnil;
++	cl_object x, other = Cnil;
+ 
+         /* Type checking, coercions, and the like, happen before we
+          * acquire the lock */
+@@ -358,7 +358,7 @@ _ecl_intern(const char *s, cl_object p)
+ cl_object
+ ecl_intern(cl_object name, cl_object p, int *intern_flag)
+ {
+-	cl_object s, ul;
++	cl_object s;
+         bool error, ignore_error = 0;
+ 
+         if (ecl_unlikely(!ECL_STRINGP(name)))
+@@ -467,7 +467,7 @@ potential_unintern_conflict(cl_object na
+ bool
+ ecl_unintern(cl_object s, cl_object p)
+ {
+-	cl_object conflict, l, hash;
++	cl_object conflict;
+ 	bool output = FALSE;
+ 	cl_object name = ecl_symbol_name(s);
+ 
+@@ -528,7 +528,6 @@ potential_export_conflict(cl_object name
+ void
+ cl_export2(cl_object s, cl_object p)
+ {
+-	cl_object x, l, hash = OBJNULL;
+ 	int intern_flag, error;
+ 	cl_object other_p, name = ecl_symbol_name(s);
+ 	p = si_coerce_to_package(p);
+@@ -1037,7 +1036,6 @@ cl_list_all_packages()
+ 
+ @(defun use_package (pack &o (pa ecl_current_package()))
+ @
+-BEGIN:
+ 	switch (type_of(pack)) {
+ 	case t_symbol:
+ 	case t_character:
+@@ -1060,7 +1058,6 @@ BEGIN:
+ 
+ @(defun unuse_package (pack &o (pa ecl_current_package()))
+ @
+-BEGIN:
+ 	switch (type_of(pack)) {
+ 	case t_symbol:
+ 	case t_character:
+diff -durpN ecl-11.1.1.ORIG/src/c/predicate.d ecl-11.1.1/src/c/predicate.d
+--- ecl-11.1.1.ORIG/src/c/predicate.d	2011-01-16 14:39:57.000000000 -0700
++++ ecl-11.1.1/src/c/predicate.d	2011-01-17 15:52:33.570155070 -0700
+@@ -17,6 +17,7 @@
+ 
+ #define ECL_INCLUDE_MATH_H
+ #include <ecl/ecl.h>
++#include <string.h>
+ 
+ cl_object
+ cl_identity(cl_object x)
+diff -durpN ecl-11.1.1.ORIG/src/c/printer/float_to_digits.d ecl-11.1.1/src/c/printer/float_to_digits.d
+--- ecl-11.1.1.ORIG/src/c/printer/float_to_digits.d	2011-01-16 14:39:57.000000000 -0700
++++ ecl-11.1.1/src/c/printer/float_to_digits.d	2011-01-17 17:06:19.458423632 -0700
+@@ -177,7 +177,6 @@ change_precision(float_approx *approx, c
+                 {
+                         cl_object e1 = cl_expt(PRINT_BASE, position);
+                         cl_object e2 = ecl_divide(e1, MAKE_FIXNUM(2));
+-                        cl_object e3 = cl_expt(PRINT_BASE, k); 
+                         if (ecl_greatereq(ecl_plus(approx->r, ecl_times(approx->s, e1)),
+                                           ecl_times(approx->s, e2)))
+                                 position = ecl_one_minus(position);
+diff -durpN ecl-11.1.1.ORIG/src/c/printer/write_symbol.d ecl-11.1.1/src/c/printer/write_symbol.d
+--- ecl-11.1.1.ORIG/src/c/printer/write_symbol.d	2011-01-16 14:39:57.000000000 -0700
++++ ecl-11.1.1/src/c/printer/write_symbol.d	2011-01-17 17:10:13.387328455 -0700
+@@ -46,8 +46,8 @@ potential_number_p(cl_object strng, int 
+ 		 * extension characters and number markers. Number
+ 		 * markers are letters, but two adjacent letters fail
+ 		 * to be a number marker. */
+-		if (ecl_digitp(c, base) >= 0 || c == '+' && c == '-' && c == '/' && c == '.' &&
+-		    c == '^' && c == '_') {
++		if (ecl_digitp(c, base) >= 0 || c == '+' || c == '-' || c == '/' || c == '.' ||
++		    c == '^' || c == '_') {
+ 			continue;
+ 		}
+ 		if (ecl_alpha_char_p(c) && ((i+1) >= l) || !ecl_alpha_char_p(s[i+1])) {
+diff -durpN ecl-11.1.1.ORIG/src/c/printer/write_ugly.d ecl-11.1.1/src/c/printer/write_ugly.d
+--- ecl-11.1.1.ORIG/src/c/printer/write_ugly.d	2011-01-16 14:39:57.000000000 -0700
++++ ecl-11.1.1/src/c/printer/write_ugly.d	2011-01-17 17:07:41.408638779 -0700
+@@ -432,7 +432,6 @@ static printer dispatch[FREE+1] = {
+ cl_object
+ si_write_ugly_object(cl_object x, cl_object stream)
+ {
+-        int t;
+ 	if (x == OBJNULL) {
+ 		if (ecl_print_readably())
+                         FEprint_not_readable(x);
+diff -durpN ecl-11.1.1.ORIG/src/c/read.d ecl-11.1.1/src/c/read.d
+--- ecl-11.1.1.ORIG/src/c/read.d	2011-01-16 14:39:57.000000000 -0700
++++ ecl-11.1.1/src/c/read.d	2011-01-17 16:58:54.298117218 -0700
+@@ -837,7 +837,7 @@ sharp_asterisk_reader(cl_object in, cl_o
+ {
+ 	cl_env_ptr env = ecl_process_env();
+ 	cl_index sp = ECL_STACK_INDEX(env);
+-	cl_object last, elt, x;
++	cl_object last = OBJNULL, elt, x;
+ 	cl_index dim, dimcount, i;
+ 	cl_object rtbl = ecl_current_readtable();
+ 	enum ecl_chattrib a;
+@@ -1040,7 +1040,7 @@ static cl_object
+ sharp_eq_reader(cl_object in, cl_object c, cl_object d)
+ {
+ 	const cl_env_ptr the_env = ecl_process_env();
+-	cl_object definition, pair, value;
++	cl_object pair, value;
+ 	cl_object sharp_eq_context = ECL_SYM_VAL(the_env, @'si::*sharp-eq-context*');
+ 
+ 	if (read_suppress) @(return);
+@@ -1712,10 +1712,6 @@ cl_readtablep(cl_object readtable)
+ 	@(return (ECL_READTABLEP(readtable) ? Ct : Cnil))
+ }
+ 
+-#ifdef ECL_UNICODE
+-static struct ecl_readtable_entry default_readtable_entry;
+-#endif
+-
+ int
+ ecl_readtable_get(cl_object readtable, int c, cl_object *macro_or_table)
+ {
+@@ -2159,7 +2155,7 @@ read_VV(cl_object block, void (*entry_po
+ 	volatile cl_object x;
+ 	cl_index i, len, perm_len, temp_len;
+ 	cl_object in;
+-	cl_object *VV, *VVtemp = 0;
++	cl_object *VV = 0, *VVtemp = 0;
+ 
+ 	if (block == NULL) {
+ 		block = ecl_alloc_object(t_codeblock);
+@@ -2275,7 +2271,6 @@ read_VV(cl_object block, void (*entry_po
+ 			cl_index fname_location = fix(prototype->block);
+ 			cl_object fname = VV[fname_location];
+ 			cl_index location = fix(prototype->name);
+-                        cl_object source = prototype->file;
+                         cl_object position = prototype->file_position;
+ 			int narg = prototype->narg;
+ 			VV[location] = narg<0?
+diff -durpN ecl-11.1.1.ORIG/src/c/reader/parse_number.d ecl-11.1.1/src/c/reader/parse_number.d
+--- ecl-11.1.1.ORIG/src/c/reader/parse_number.d	2011-01-16 14:39:57.000000000 -0700
++++ ecl-11.1.1/src/c/reader/parse_number.d	2011-01-17 17:04:54.223279919 -0700
+@@ -23,12 +23,6 @@ exponent_charp(cl_fixnum c)
+ }
+ 
+ static cl_object
+-read_exponent(cl_object str, cl_index start, cl_index end, cl_index *ep)
+-{
+-
+-}
+-
+-static cl_object
+ expt10(cl_index expt)
+ {
+         cl_object accum = _ecl_big_register0();
+diff -durpN ecl-11.1.1.ORIG/src/c/reference.d ecl-11.1.1/src/c/reference.d
+--- ecl-11.1.1.ORIG/src/c/reference.d	2011-01-16 14:39:57.000000000 -0700
++++ ecl-11.1.1/src/c/reference.d	2011-01-17 16:36:52.751971634 -0700
+@@ -164,7 +164,6 @@ cl_boundp(cl_object sym)
+ cl_object
+ cl_special_operator_p(cl_object form)
+ {
+-	const cl_env_ptr the_env = ecl_process_env();
+ 	int special = ecl_symbol_type(form) & stp_special_form;
+ 	@(return (special? Ct : Cnil))
+ }
+diff -durpN ecl-11.1.1.ORIG/src/c/symbol.d ecl-11.1.1/src/c/symbol.d
+--- ecl-11.1.1.ORIG/src/c/symbol.d	2011-01-16 14:39:57.000000000 -0700
++++ ecl-11.1.1/src/c/symbol.d	2011-01-17 16:05:35.195029108 -0700
+@@ -280,7 +280,6 @@ cl_symbol_plist(cl_object sym)
+ cl_object
+ cl_get_properties(cl_object place, cl_object indicator_list)
+ {
+-	const cl_env_ptr the_env = ecl_process_env();
+ 	cl_object l;
+ 
+ #ifdef ECL_SAFE
+@@ -403,7 +402,6 @@ cl_keywordp(cl_object sym)
+ cl_object
+ si_rem_f(cl_object plist, cl_object indicator)
+ {
+-	cl_env_ptr the_env = ecl_process_env();
+ 	bool found = remf(&plist, indicator);
+ 	@(return plist (found? Ct : Cnil))
+ }
+diff -durpN ecl-11.1.1.ORIG/src/h/ecl-inl.h ecl-11.1.1/src/h/ecl-inl.h
+--- ecl-11.1.1.ORIG/src/h/ecl-inl.h	2011-01-16 14:40:01.000000000 -0700
++++ ecl-11.1.1/src/h/ecl-inl.h	2011-01-17 15:55:36.383144132 -0700
+@@ -69,11 +69,11 @@
+                 cl_fixnum padding[(sizeof(struct ecl_base_string)+3)/4*4]; \
+         } name[]
+ 
+-#define ecl_def_string_array_elt(chars) {                      \
++#define ecl_def_string_array_elt(chars) { {                     \
+                 (int8_t)t_base_string, 0, aet_bc, 0,            \
+                         Cnil, (cl_index)(sizeof(chars))-1,      \
+                         (cl_index)(sizeof(chars))-1,            \
+-                        (ecl_base_char*)(chars) }
++                        (ecl_base_char*)(chars) } }
+ 
+ #define ecl_def_ct_base_string(name,chars,len,static,const)     \
+         static const struct ecl_base_string name ## _data = {    \
+diff -durpN ecl-11.1.1.ORIG/src/h/external.h ecl-11.1.1/src/h/external.h
+--- ecl-11.1.1.ORIG/src/h/external.h	2011-01-16 14:40:01.000000000 -0700
++++ ecl-11.1.1/src/h/external.h	2011-01-17 17:04:03.315388558 -0700
+@@ -421,7 +421,7 @@ extern ECL_API void ecl_def_c_function(c
+ extern ECL_API void ecl_def_c_macro(cl_object sym, cl_objectfn_fixed c_function, int narg);
+ extern ECL_API void ecl_def_c_macro_va(cl_object sym, cl_objectfn c_function);
+ extern ECL_API void ecl_def_c_function_va(cl_object sym, cl_objectfn c_function);
+-extern ECL_API cl_object ecl_set_function_source_file_info(cl_object fun, cl_object source, cl_object position);
++extern ECL_API void ecl_set_function_source_file_info(cl_object fun, cl_object source, cl_object position);
+ extern ECL_API void ecl_cmp_defmacro(cl_object data);
+ extern ECL_API void ecl_cmp_defun(cl_object data);
+ 
+diff -durpN ecl-11.1.1.ORIG/src/h/internal.h ecl-11.1.1/src/h/internal.h
+--- ecl-11.1.1.ORIG/src/h/internal.h	2011-01-16 14:40:01.000000000 -0700
++++ ecl-11.1.1/src/h/internal.h	2011-01-17 16:23:44.981191586 -0700
+@@ -187,7 +187,6 @@ extern void _ecl_unexpected_return() ecl
+         frame->frame.env = env;                                         \
+         frame->frame.size = narg;                                       \
+         if (narg < C_ARGUMENTS_LIMIT) {                                 \
+-                cl_index i;                                             \
+                 cl_object *p = frame->frame.base = env->values;         \
+                 va_list args;                                           \
+                 va_start(args, lastarg);                                \
+@@ -405,6 +404,9 @@ extern cl_object si_serialize(cl_object 
+ extern cl_object si_deserialize(cl_object root);
+ extern cl_object ecl_deserialize(uint8_t *data);
+ 
++/* stacks.d */
++extern void ecl_cs_set_org(cl_env_ptr env);
++
+ /* string.d */
+ #define ecl_vector_start_end ecl_sequence_start_end
+ 
+@@ -415,6 +417,13 @@ extern ECL_API cl_object mp_suspend_loop
+ extern ECL_API cl_object mp_break_suspend_loop();
+ #endif
+ 
++/* threads/rwlock.d */
++
++#ifdef ECL_THREADS
++extern cl_object mp_get_rwlock_read_wait(cl_object lock);
++extern cl_object mp_get_rwlock_write_wait(cl_object lock);
++#endif
++
+ /* time.d */
+ 
+ #define UTC_time_to_universal_time(x) ecl_plus(ecl_make_integer(x),cl_core.Jan1st1970UT)

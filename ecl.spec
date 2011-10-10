@@ -1,6 +1,6 @@
 Name:           ecl
 Version:        11.1.1
-Release:        1%{?dist}
+Release:        1%{?dist}.1
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
@@ -143,6 +143,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Oct 10 2011 Peter Schiffer <pschiffe@redhat.com> - 11.1.1-1.1
+- rebuild with new gmp
+
 * Tue Mar  1 2011 Jerry James <loganjerry@gmail.com> - 11.1.1-1
 - New release 11.1.1
 - Drop libffi patch (fixed upstream)

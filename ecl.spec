@@ -1,6 +1,6 @@
 Name:           ecl
 Version:        11.1.1
-Release:        1%{?dist}.1
+Release:        1%{?dist}.2
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
@@ -143,6 +143,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Oct 20 2011 Marcela Mašláňová <mmaslano@redhat.com> - 11.1.1-1.2
+- rebuild with new gmp without compat lib
+
 * Mon Oct 10 2011 Peter Schiffer <pschiffe@redhat.com> - 11.1.1-1.1
 - rebuild with new gmp
 

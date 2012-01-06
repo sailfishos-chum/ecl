@@ -1,6 +1,6 @@
 Name:           ecl
 Version:        11.1.1
-Release:        1%{?dist}.2
+Release:        2%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
@@ -79,7 +79,6 @@ make -C ecl-doc
 
 
 %install
-rm -rf $RPM_BUILD_ROOT
 make DESTDIR=$RPM_BUILD_ROOT install
 
 # Remove installed files that are in the wrong place
@@ -124,12 +123,7 @@ fi
 gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
 
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-
-
 %files
-%defattr(-,root,root,-)
 %{_bindir}/ecl
 %{_bindir}/ecl-config
 %{_datadir}/applications/ecl.desktop
@@ -143,6 +137,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Jan  6 2012 Jerry James <loganjerry@gmail.com> - 11.1.1-2
+- Rebuild for GCC 4.7
+- Drop unnecessary spec file elements (clean script, etc.)
+
 * Thu Oct 20 2011 Marcela Mašláňová <mmaslano@redhat.com> - 11.1.1-1.2
 - rebuild with new gmp without compat lib
 

@@ -1,12 +1,12 @@
 Name:           ecl
-Version:        11.1.1
-Release:        2%{?dist}
+Version:        12.2.1
+Release:        1%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
 License:        LGPLv2+ and BSD and MIT and Public Domain
 URL:            http://ecls.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/project/ecls/ecls/11.1/ecl-%{version}.tar.gz
+Source0:        http://downloads.sourceforge.net/ecls/ecl-%{version}.tgz
 # The manual has not yet been released.  Use the following commands to generate
 # the manual tarball:
 #   git clone git://ecls.git.sourceforge.net/gitroot/ecls/ecl-doc
@@ -21,28 +21,28 @@ Source2:        ecl.desktop
 # A modified version of src/util/ecl.svg with extra whitespace removed.  The
 # extra whitespace made the icon appear very small and shoved into a corner.
 Source3:        ecl.svg
-# This patch was accepted upstream on 9 Jan 2011.  It fixes a few autoconf
-# constructs that are broken for Fedora, and also avoids building
-# libatomic_ops from source.
-Patch0:         ecl-11.1.1-configure.patch
-# This patch was accepted upstream on 21 Jan 2011.  It fixes a few warnings
+# This patch is Fedora-specific; it will not be sent upstream.  It avoids
+# building libatomic_ops from source.
+Patch0:         ecl-12.2.1-atomic_ops.patch
+# This patch was sent upstream on 4 Feb 2012.  It fixes a few warnings
 # from the C compiler that indicate situations that might be dangerous at
 # runtime.
-Patch1:         ecl-11.1.1-warnings.patch
+Patch1:         ecl-12.2.1-warnings.patch
 
 BuildRequires:  libX11-devel
 BuildRequires:  pkgconfig
 BuildRequires:  gmp-devel
 BuildRequires:  gc-devel
-BuildRequires:  libffi-devel
 BuildRequires:  libatomic_ops-devel
+BuildRequires:  libffi-devel
 BuildRequires:  emacs-common
 BuildRequires:  docbook-dtds
 BuildRequires:  xmlto
 BuildRequires:  desktop-file-utils
 Requires:       gcc
-Requires(post): coreutils, desktop-file-utils, gtk2
-Requires(postun): coreutils, desktop-file-utils, gtk2
+Requires:       hicolor-icon-theme
+Requires(post): coreutils
+Requires(postun): coreutils
 
 %description
 ECL (Embeddable Common Lisp) is an implementation of the Common Lisp
@@ -59,7 +59,7 @@ Gray streams.
 %setup -q
 %setup -q -T -D -a 1
 %patch0
-%patch1 -p1
+%patch1
 
 # Remove spurious executable bits
 chmod a-x src/CHANGELOG
@@ -68,12 +68,12 @@ find src/h -type f -perm /0111 | xargs chmod a-x
 
 
 %build
-%configure --enable-unicode --enable-c99complex --enable-rpath=no \
-  --enable-threads=yes --with-__thread --with-clx \
+%configure --enable-unicode=yes --enable-c99complex --enable-threads=yes \
+  --with-__thread --with-clx \
 %ifarch x86_64
   --with-sse \
 %endif
-  CPPFLAGS=`pkg-config --cflags libffi` CFLAGS="${RPM_OPT_FLAGS}"
+  CPPFLAGS=`pkg-config --cflags libffi`
 make
 make -C ecl-doc
 
@@ -137,6 +137,10 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
 
 
 %changelog
+* Sat Feb  4 2012 Jerry James <loganjerry@gmail.com> - 12.2.1-1
+- New upstream release
+- Fix source URL
+
 * Fri Jan  6 2012 Jerry James <loganjerry@gmail.com> - 11.1.1-2
 - Rebuild for GCC 4.7
 - Drop unnecessary spec file elements (clean script, etc.)

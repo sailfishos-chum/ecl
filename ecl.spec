@@ -1,6 +1,6 @@
 Name:           ecl
 Version:        12.2.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
@@ -39,7 +39,9 @@ BuildRequires:  emacs-common
 BuildRequires:  docbook-dtds
 BuildRequires:  xmlto
 BuildRequires:  desktop-file-utils
-Requires:       gcc
+Requires:       gcc%{?_isa}
+Requires:       gc-devel%{?_isa}
+Requires:       gmp-devel%{?_isa}
 Requires:       hicolor-icon-theme
 Requires(post): coreutils
 Requires(postun): coreutils
@@ -105,6 +107,7 @@ cp -p %{SOURCE3} $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/scalable/apps
 
 
 %post
+/sbin/ldconfig
 update-desktop-database -q >&/dev/null ||:
 touch --no-create %{_datadir}/icons/hicolor
 
@@ -119,7 +122,6 @@ fi
 
 
 %posttrans
-/sbin/ldconfig
 gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
 
 
@@ -137,6 +139,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
 
 
 %changelog
+* Thu Apr 26 2012 Jerry James <loganjerry@gmail.com> - 12.2.1-2
+- Add missing Requires (bz 816675)
+
 * Sat Feb  4 2012 Jerry James <loganjerry@gmail.com> - 12.2.1-1
 - New upstream release
 - Fix source URL

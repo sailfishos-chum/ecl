@@ -1,12 +1,12 @@
 Name:           ecl
 Version:        12.2.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
 License:        LGPLv2+ and BSD and MIT and Public Domain
 URL:            http://ecls.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/ecls/ecl-%{version}.tgz
+Source0:        http://downloads.sourceforge.net/ecls/%{name}-%{version}.tgz
 # The manual has not yet been released.  Use the following commands to generate
 # the manual tarball:
 #   git clone git://ecls.git.sourceforge.net/gitroot/ecls/ecl-doc
@@ -16,18 +16,25 @@ Source0:        http://downloads.sourceforge.net/ecls/ecl-%{version}.tgz
 #   cd ..
 #   tar cf ecl-doc.tar ecl-doc
 #   xz ecl-doc.tar
-Source1:        ecl-doc.tar.xz
-Source2:        ecl.desktop
+Source1:        %{name}-doc.tar.xz
+Source2:        %{name}.desktop
 # A modified version of src/util/ecl.svg with extra whitespace removed.  The
 # extra whitespace made the icon appear very small and shoved into a corner.
-Source3:        ecl.svg
+Source3:        %{name}.svg
 # This patch is Fedora-specific; it will not be sent upstream.  It avoids
 # building libatomic_ops from source.
-Patch0:         ecl-12.2.1-atomic_ops.patch
+Patch0:         %{name}-12.2.1-atomic_ops.patch
 # This patch was sent upstream on 4 Feb 2012.  It fixes a few warnings
 # from the C compiler that indicate situations that might be dangerous at
 # runtime.
-Patch1:         ecl-12.2.1-warnings.patch
+Patch1:         %{name}-12.2.1-warnings.patch
+# Do not use a separate thread to handle signals by default if built with
+# bohem-gc support.
+# This prevents a deadlock when building maxima with ecl support in
+# fedora, and should handle by default these problems:
+# http://trac.sagemath.org/sage_trac/ticket/11752
+# http://www.mail-archive.com/ecls-list@lists.sourceforge.net/msg00644.html
+Patch2:         %{name}-12.2.1-signal_handling_thread.patch
 
 BuildRequires:  libX11-devel
 BuildRequires:  pkgconfig
@@ -39,7 +46,9 @@ BuildRequires:  emacs-common
 BuildRequires:  docbook-dtds
 BuildRequires:  xmlto
 BuildRequires:  desktop-file-utils
-Requires:       gcc%{?_isa}
+Requires:       gcc
+Requires:       libgcc%{?_isa}
+Requires:       glibc-devel%{?_isa}
 Requires:       gc-devel%{?_isa}
 Requires:       gmp-devel%{?_isa}
 Requires:       hicolor-icon-theme
@@ -62,6 +71,7 @@ Gray streams.
 %setup -q -T -D -a 1
 %patch0
 %patch1
+%patch2
 
 # Remove spurious executable bits
 chmod a-x src/CHANGELOG
@@ -71,7 +81,7 @@ find src/h -type f -perm /0111 | xargs chmod a-x
 
 %build
 %configure --enable-unicode=yes --enable-c99complex --enable-threads=yes \
-  --with-__thread --with-clx \
+  --with-__thread --with-clx --disable-rpath \
 %ifarch x86_64
   --with-sse \
 %endif
@@ -139,6 +149,11 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
 
 
 %changelog
+* Wed Jun 13 2012 Jerry James <loganjerry@gmail.com> - 12.2.1-3
+- Fix Requires so 32-bit gcc is not dragged into 64-bit platforms (bz 831383)
+- Apply multiple fixes from bz 821183
+- Rebuild to fix bz 822296
+
 * Thu Apr 26 2012 Jerry James <loganjerry@gmail.com> - 12.2.1-2
 - Add missing Requires (bz 816675)
 

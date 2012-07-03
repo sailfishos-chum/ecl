@@ -1,6 +1,6 @@
 Name:           ecl
 Version:        12.2.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
@@ -51,6 +51,7 @@ Requires:       libgcc%{?_isa}
 Requires:       glibc-devel%{?_isa}
 Requires:       gc-devel%{?_isa}
 Requires:       gmp-devel%{?_isa}
+Requires:       libffi-devel%{?_isa}
 Requires:       hicolor-icon-theme
 Requires(post): coreutils
 Requires(postun): coreutils
@@ -149,6 +150,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
 
 
 %changelog
+* Tue Jul 03 2012 Rex Dieter <rdieter@fedoraproject.org> 12.2.1-4
+- ecl missing Requires: libffi-devel (#837102)
+
 * Wed Jun 13 2012 Jerry James <loganjerry@gmail.com> - 12.2.1-3
 - Fix Requires so 32-bit gcc is not dragged into 64-bit platforms (bz 831383)
 - Apply multiple fixes from bz 821183

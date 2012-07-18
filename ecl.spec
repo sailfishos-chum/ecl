@@ -1,6 +1,6 @@
 Name:           ecl
 Version:        12.2.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
@@ -150,6 +150,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
 
 
 %changelog
+* Wed Jul 18 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 12.2.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
+
 * Tue Jul 03 2012 Rex Dieter <rdieter@fedoraproject.org> 12.2.1-4
 - ecl missing Requires: libffi-devel (#837102)
 

@@ -1,0 +1,63 @@
+--- ./src/c/symbols_list.h.orig	2012-07-24 10:51:53.000000000 -0600
++++ ./src/c/symbols_list.h	2012-08-08 13:07:07.920096592 -0600
+@@ -1233,7 +1233,7 @@ cl_symbols[] = {
+ {SYS_ "REPLACE-ARRAY", SI_ORDINARY, si_replace_array, 2, OBJNULL},
+ {SYS_ "ROW-MAJOR-ASET", SI_ORDINARY, si_row_major_aset, 3, OBJNULL},
+ {EXT_ "RUN-PROGRAM", EXT_ORDINARY, si_run_program, -1, OBJNULL},
+-{SYS_ "WAIT-FOR-ALL-PROCESSES", SI_ORDINARY, si_wait_for_all_processes, 0, OBJNULL},
++{SYS_ "WAIT-FOR-ALL-PROCESSES", SI_ORDINARY, si_wait_for_all_processes, -1, OBJNULL},
+ {EXT_ "SAFE-EVAL", EXT_ORDINARY, ECL_NAME(si_safe_eval), -1, OBJNULL},
+ {SYS_ "SCH-FRS-BASE", SI_ORDINARY, si_sch_frs_base, 2, OBJNULL},
+ {SYS_ "SCHAR-SET", SI_ORDINARY, si_char_set, 3, OBJNULL},
+--- ./src/c/unixsys.d.orig	2012-07-24 10:51:53.000000000 -0600
++++ ./src/c/unixsys.d	2012-08-08 13:07:07.921096588 -0600
+@@ -289,8 +289,8 @@ ecl_waitpid(cl_object pid, cl_object wai
+         @(return status code pid)
+ }
+ 
+-cl_object
+-si_wait_for_all_processes()
++@(defun si::wait-for-all-processes (&key (process ECL_NIL))
++@
+ {
+         const cl_env_ptr env = ecl_process_env();
+ #if defined(SIGCHLD) && !defined(ECL_WINDOWS_HOST)
+@@ -315,6 +315,7 @@ si_wait_for_all_processes()
+ #endif
+         ecl_return0(env);
+ }
++@)
+ 
+ #if defined(ECL_MS_WINDOWS_HOST) || defined(cygwin)
+ cl_object
+--- ./src/c/unixint.d.orig	2012-08-08 12:44:57.745877433 -0600
++++ ./src/c/unixint.d	2012-08-08 13:07:07.921096588 -0600
+@@ -563,7 +563,7 @@ asynchronous_signal_servicing_thread()
+ 		}
+ #ifdef SIGCHLD
+ 		if (signal_thread_msg.signo == SIGCHLD) {
+-			si_wait_for_all_processes();
++			si_wait_for_all_processes(0);
+ 			continue;
+ 		}
+ #endif
+@@ -1187,7 +1187,7 @@ asynchronous_signal_servicing_thread()
+ #endif
+ #ifdef SIGCHLD
+                         if (signo == SIGCHLD) {
+-                                si_wait_for_all_processes();
++                                si_wait_for_all_processes(0);
+                                 continue;
+                         }
+ #endif
+--- ./src/h/internal.h.orig	2012-07-24 10:51:53.000000000 -0600
++++ ./src/h/internal.h	2012-08-08 13:07:07.922096585 -0600
+@@ -516,7 +516,7 @@ extern cl_object mp_get_rwlock_write_wai
+ extern void ecl_interrupt_process(cl_object process, cl_object function);
+ 
+ /* unixsys.d */
+-extern cl_object si_wait_for_all_processes();
++extern cl_object si_wait_for_all_processes _ECL_ARGS((cl_narg narg, ...));
+ 
+ /*
+  * Fake several ISO C99 mathematical functions

@@ -1,21 +1,20 @@
 Name:           ecl
-Version:        12.2.1
-Release:        5%{?dist}
+Version:        12.7.1
+Release:        1%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
 License:        LGPLv2+ and BSD and MIT and Public Domain
 URL:            http://ecls.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/ecls/%{name}-%{version}.tgz
+Source0:        http://downloads.sourceforge.net/ecls/%{name}-%{version}.tar.gz
 # The manual has not yet been released.  Use the following commands to generate
 # the manual tarball:
 #   git clone git://ecls.git.sourceforge.net/gitroot/ecls/ecl-doc
 #   cd ecl-doc
-#   git checkout 04798a28d55c5ec096af5976f0ceef663f4d717b
+#   git checkout 5d2657b5b32a2b5df701ba1ffa768e3e05816b70
 #   rm -fr .git
 #   cd ..
-#   tar cf ecl-doc.tar ecl-doc
-#   xz ecl-doc.tar
+#   tar cJf ecl-doc.tar.xz ecl-doc
 Source1:        %{name}-doc.tar.xz
 Source2:        %{name}.desktop
 # A modified version of src/util/ecl.svg with extra whitespace removed.  The
@@ -23,18 +22,21 @@ Source2:        %{name}.desktop
 Source3:        %{name}.svg
 # This patch is Fedora-specific; it will not be sent upstream.  It avoids
 # building libatomic_ops from source.
-Patch0:         %{name}-12.2.1-atomic_ops.patch
+Patch0:         %{name}-12.7.1-atomic_ops.patch
 # This patch was sent upstream on 4 Feb 2012.  It fixes a few warnings
 # from the C compiler that indicate situations that might be dangerous at
 # runtime.
-Patch1:         %{name}-12.2.1-warnings.patch
+Patch1:         %{name}-12.7.1-warnings.patch
 # Do not use a separate thread to handle signals by default if built with
 # bohem-gc support.
 # This prevents a deadlock when building maxima with ecl support in
 # fedora, and should handle by default these problems:
 # http://trac.sagemath.org/sage_trac/ticket/11752
 # http://www.mail-archive.com/ecls-list@lists.sourceforge.net/msg00644.html
-Patch2:         %{name}-12.2.1-signal_handling_thread.patch
+Patch2:         %{name}-12.7.1-signal_handling_thread.patch
+# Sent upstream 8 Aug 2012.  Fix a signal handler interface that does not
+# conform to the required interface.
+Patch3:         %{name}-12.7.1-sighandler.patch
 
 BuildRequires:  libX11-devel
 BuildRequires:  pkgconfig
@@ -73,6 +75,7 @@ Gray streams.
 %patch0
 %patch1
 %patch2
+%patch3
 
 # Remove spurious executable bits
 chmod a-x src/CHANGELOG
@@ -88,7 +91,9 @@ find src/h -type f -perm /0111 | xargs chmod a-x
 %endif
   CPPFLAGS=`pkg-config --cflags libffi`
 make
+mkdir -p ecl-doc/tmp
 make -C ecl-doc
+rm ecl-doc/html/ecl2.proc
 
 
 %install
@@ -146,10 +151,14 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
 %{_includedir}/ecl
 %{_mandir}/man1/*
 %doc ANNOUNCEMENT Copyright LGPL examples src/CHANGELOG
-%doc ecl-doc/ecl.css ecl-doc/html src/doc/amop.txt src/doc/types-and-classes
+%doc ecl-doc/html src/doc/amop.txt src/doc/types-and-classes
 
 
 %changelog
+* Wed Aug  8 2012 Jerry James <loganjerry@gmail.com> - 12.7.1-1
+- New upstream release
+- Add sighandler patch to fix thread-enabled build
+
 * Wed Jul 18 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 12.2.1-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 

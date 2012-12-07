@@ -1,5 +1,5 @@
---- ./src/c/main.d.orig	2012-07-24 10:51:53.000000000 -0600
-+++ ./src/c/main.d	2012-07-27 15:43:14.666816529 -0600
+--- ./src/c/main.d.orig	2012-12-07 14:01:02.000000000 -0700
++++ ./src/c/main.d	2012-12-07 15:35:06.105922908 -0700
 @@ -76,7 +76,11 @@ cl_fixnum ecl_option_values[ECL_OPT_LIMI
  	1,		/* ECL_OPT_TRAP_SIGPIPE */
  	1,		/* ECL_OPT_TRAP_SIGCHLD */
@@ -12,7 +12,7 @@
  	16,		/* ECL_OPT_SIGNAL_QUEUE_SIZE */
  	0,		/* ECL_OPT_BOOTED */
  	8192,		/* ECL_OPT_BIND_STACK_SIZE */
-@@ -504,11 +508,11 @@ cl_boot(int argc, char **argv)
+@@ -506,11 +510,11 @@ cl_boot(int argc, char **argv)
  		return 1;
  	}
  

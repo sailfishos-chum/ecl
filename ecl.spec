@@ -1,17 +1,17 @@
 Name:           ecl
-Version:        12.7.1
+Version:        12.12.1
 Release:        1%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
 License:        LGPLv2+ and BSD and MIT and Public Domain
 URL:            http://ecls.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/ecls/%{name}-%{version}.tar.gz
+Source0:        http://downloads.sourceforge.net/ecls/%{name}-%{version}.tgz
 # The manual has not yet been released.  Use the following commands to generate
 # the manual tarball:
 #   git clone git://ecls.git.sourceforge.net/gitroot/ecls/ecl-doc
 #   cd ecl-doc
-#   git checkout 5d2657b5b32a2b5df701ba1ffa768e3e05816b70
+#   git checkout 3af1c1eaec1a3cb590c0ce140f881f48be19995e
 #   rm -fr .git
 #   cd ..
 #   tar cJf ecl-doc.tar.xz ecl-doc
@@ -20,23 +20,17 @@ Source2:        %{name}.desktop
 # A modified version of src/util/ecl.svg with extra whitespace removed.  The
 # extra whitespace made the icon appear very small and shoved into a corner.
 Source3:        %{name}.svg
-# This patch is Fedora-specific; it will not be sent upstream.  It avoids
-# building libatomic_ops from source.
-Patch0:         %{name}-12.7.1-atomic_ops.patch
 # This patch was sent upstream on 4 Feb 2012.  It fixes a few warnings
 # from the C compiler that indicate situations that might be dangerous at
 # runtime.
-Patch1:         %{name}-12.7.1-warnings.patch
+Patch0:         %{name}-12.12.1-warnings.patch
 # Do not use a separate thread to handle signals by default if built with
-# bohem-gc support.
+# boehm-gc support.
 # This prevents a deadlock when building maxima with ecl support in
 # fedora, and should handle by default these problems:
 # http://trac.sagemath.org/sage_trac/ticket/11752
 # http://www.mail-archive.com/ecls-list@lists.sourceforge.net/msg00644.html
-Patch2:         %{name}-12.7.1-signal_handling_thread.patch
-# Sent upstream 8 Aug 2012.  Fix a signal handler interface that does not
-# conform to the required interface.
-Patch3:         %{name}-12.7.1-sighandler.patch
+Patch1:         %{name}-12.12.1-signal_handling_thread.patch
 
 BuildRequires:  libX11-devel
 BuildRequires:  pkgconfig
@@ -74,8 +68,6 @@ Gray streams.
 %setup -q -T -D -a 1
 %patch0
 %patch1
-%patch2
-%patch3
 
 # Remove spurious executable bits
 chmod a-x src/CHANGELOG
@@ -155,6 +147,10 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
 
 
 %changelog
+* Fri Dec  7 2012 Jerry James <loganjerry@gmail.com> - 12.12.1-1
+- New upstream release
+- Drop upstreamed patches
+
 * Wed Aug  8 2012 Jerry James <loganjerry@gmail.com> - 12.7.1-1
 - New upstream release
 - Add sighandler patch to fix thread-enabled build

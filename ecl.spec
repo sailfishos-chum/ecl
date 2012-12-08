@@ -1,6 +1,6 @@
 Name:           ecl
 Version:        12.12.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
@@ -139,7 +139,8 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
 %{_datadir}/applications/ecl.desktop
 %{_datadir}/icons/hicolor/scalable/apps/ecl.svg
 %{_libdir}/ecl*
-%{_libdir}/libecl.so*
+%{_libdir}/libecl.so.12*
+%{_libdir}/libecl.so
 %{_includedir}/ecl
 %{_mandir}/man1/*
 %doc ANNOUNCEMENT Copyright LGPL examples src/CHANGELOG
@@ -147,6 +148,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
 
 
 %changelog
+* Sat Dec 08 2012 Rex Dieter <rdieter@fedoraproject.org> 12.12.1-2
+- track libecl soname, so bumps aren't a surprise
+
 * Fri Dec  7 2012 Jerry James <loganjerry@gmail.com> - 12.12.1-1
 - New upstream release
 - Drop upstreamed patches

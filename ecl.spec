@@ -139,7 +139,8 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
 %{_datadir}/applications/ecl.desktop
 %{_datadir}/icons/hicolor/scalable/apps/ecl.svg
 %{_libdir}/ecl*
-%{_libdir}/libecl.so.12*
+%{_libdir}/libecl.so.12.12*
+%{_libdir}/libecl.so.12
 %{_libdir}/libecl.so
 %{_includedir}/ecl
 %{_mandir}/man1/*

@@ -1,6 +1,6 @@
 Name:           ecl
 Version:        12.12.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
@@ -31,15 +31,20 @@ Patch0:         %{name}-12.12.1-warnings.patch
 # http://trac.sagemath.org/sage_trac/ticket/11752
 # http://www.mail-archive.com/ecls-list@lists.sourceforge.net/msg00644.html
 Patch1:         %{name}-12.12.1-signal_handling_thread.patch
+# Bug-fixing patches cherry picked from upstream's git.
+Patch2:         %{name}-12.12.1-fixes.patch
+# Work around xsltproc requiring namespace declarations for entities.
+Patch3:         %{name}-12.12.1-xsltproc.patch
 
 BuildRequires:  libX11-devel
 BuildRequires:  pkgconfig
 BuildRequires:  gmp-devel
 BuildRequires:  gc-devel
-BuildRequires:  libatomic_ops-devel
+BuildRequires:  libatomic_ops-static
 BuildRequires:  libffi-devel
 BuildRequires:  emacs-common
-BuildRequires:  docbook-dtds
+BuildRequires:  docbook5-schemas
+BuildRequires:  docbook5-style-xsl
 BuildRequires:  xmlto
 BuildRequires:  desktop-file-utils
 Requires:       gcc
@@ -68,6 +73,8 @@ Gray streams.
 %setup -q -T -D -a 1
 %patch0
 %patch1
+%patch2 -p1
+%patch3
 
 # Remove spurious executable bits
 chmod a-x src/CHANGELOG
@@ -149,6 +156,11 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
 
 
 %changelog
+* Thu Dec 20 2012 Jerry James <loganjerry@gmail.com> - 12.12.1-3
+- BR libatomic_ops-static instead of -devel (bz 889173)
+- Pull in upstream patches for bugs discovered post-release
+- Documentation needs docbook 5 schemas and XSL
+
 * Sat Dec 08 2012 Rex Dieter <rdieter@fedoraproject.org> 12.12.1-2
 - track libecl soname, so bumps aren't a surprise
 

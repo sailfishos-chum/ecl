@@ -1,0 +1,173 @@
+ENSURE-DIRECTORIES-EXIST ignores the host and device from the original
+pathname when creating the directories.
+
+diff --git a/src/lsp/mislib.lsp b/src/lsp/mislib.lsp
+index 0f6eb45..9b37225 100644
+--- a/src/lsp/mislib.lsp
++++ b/src/lsp/mislib.lsp
+@@ -282,7 +282,7 @@ where CREATED is true only if we succeeded on creating all directories."
+ 			  :defaults full-pathname)))
+       (dolist (item (pathname-directory full-pathname))
+ 	(setf d (nconc d (list item)))
+-	(let* ((p (make-pathname :directory d)))
++	(let* ((p (make-pathname :directory d :defaults *default-pathname-defaults*)))
+ 	  (unless (or (symbolp item) (si::file-kind p nil))
+ 	    (setf created t)
+ 	    (let ((ps (namestring p)))
+
+ffi:definline referenced a symbol from the C package without package prefix.
+
+diff --git a/src/lsp/ffi.lsp b/src/lsp/ffi.lsp
+index a38288c..8b66a2e 100644
+--- a/src/lsp/ffi.lsp
++++ b/src/lsp/ffi.lsp
+@@ -681,7 +681,7 @@ the actual arguments are of the specified type."
+               ;; defCbody must go first, because it clears symbol-plist of fun
+               (defCbody ,fun ,arg-types ,type ,code)
+               (declaim (ftype (function ,arg-types ,type) ,fun))
+-	      (def-inline ,fun :always ,arg-types ,type ,code)))
++	      (c::def-inline ,fun :always ,arg-types ,type ,code)))
+ 
+ (defmacro defla (&rest body)
+ "Syntax: (defla name lambda-list &body body)" "
+
+Write SCALE-FLOAT so that it cannot lead to infinite loops.
+
+diff --git a/src/lsp/format.lsp b/src/lsp/format.lsp
+index a44b810..d18054f 100644
+--- a/src/lsp/format.lsp
++++ b/src/lsp/format.lsp
+@@ -196,6 +196,20 @@
+       ;; Note that we have to compute the exponential _every_ _time_ in the loop
+       ;; because multiplying just by 10.0l0 every time would lead to a greater
+       ;; loss of precission.
++      (let ((ex (round (* exponent #.(log 2l0 10)))))
++	(declare (fixnum ex))
++	(if (minusp ex)
++	    (loop for y of-type long-float
++		 = (* x (the long-float (expt 10.0l0 (- ex))))
++	       while (<= y 0.1l0)
++	       do (decf ex)
++	       finally (return (values y (the fixnum (+ delta ex)))))
++	    (loop for y of-type long-float
++		 = (/ x (the long-float (expt 10.0l0 ex)))
++	       while (> y 1.0l0)
++	       do (incf ex)
++	       finally (return (values y (the fixnum (+ delta ex)))))))
++      #+(or)
+       (loop with ex of-type fixnum
+ 	   = (round (* exponent #.(log 2l0 10)))
+ 	 for y of-type long-float
+
+(CONCATENATE 'SIMPLE-BASE-STRING ...) returns an ordinary string.
+
+diff --git a/src/lsp/seq.lsp b/src/lsp/seq.lsp
+index ee24580..16ff41f 100644
+--- a/src/lsp/seq.lsp
++++ b/src/lsp/seq.lsp
+@@ -72,7 +72,7 @@
+        (setq elt-type 'BASE-CHAR
+ 	     length (if (endp args) '* (first args))))
+       #+unicode
+-      ((BASE-STRING BASE-SIMPLE-STRING)
++      ((BASE-STRING SIMPLE-BASE-STRING)
+        (setq elt-type 'BASE-CHAR
+ 	     length (if (endp args) '* (first args))))
+       #+unicode
+
+Null terminate the base-strings created by make-array.
+
+diff --git a/src/c/array.d b/src/c/array.d
+index d844602..e6b8e76 100644
+--- a/src/c/array.d
++++ b/src/c/array.d
+@@ -552,6 +552,13 @@ ecl_array_allocself(cl_object x)
+ 		return;
+         }
+ #endif
++	case ecl_aet_bc: {
++		cl_index elt_size = 1;
++		x->vector.self.bc = (ecl_base_char *)ecl_alloc_atomic(d+1);
++		/* Null terminate the string */
++		x->vector.self.bc[d] = 0;
++		break;
++	}
+         case ecl_aet_bit:
+                 d = (d + (CHAR_BIT-1)) / CHAR_BIT;
+                 x->vector.self.bit = (byte *)ecl_alloc_atomic(d);
+@@ -574,7 +581,7 @@ ecl_alloc_simple_vector(cl_index l, cl_elttype aet)
+ 	case ecl_aet_bc:
+                 x = ecl_alloc_compact_object(t_base_string, l+1);
+                 x->base_string.self = ECL_COMPACT_OBJECT_EXTRA(x);
+-                memset(x->base_string.self, 0, l+1);
++		x->base_string.self[l] = 0;
+                 break;
+ #ifdef ECL_UNICODE
+ 	case ecl_aet_ch:
+
+In type propagators, the function name is rarely use: declare it ignorable.
+
+diff --git a/src/cmp/cmptype-prop.lsp b/src/cmp/cmptype-prop.lsp
+index f266ef0..0b6ae1d 100644
+--- a/src/cmp/cmptype-prop.lsp
++++ b/src/cmp/cmptype-prop.lsp
+@@ -71,7 +71,7 @@
+       (setf lambda-list (append lambda-list (list '&rest var))
+             body (list* `(declare (ignorable ,var)) body))))
+   `(setf (gethash ',fname *p0-dispatch-table*)
+-         #'(lambda ,lambda-list ,@body)))
++         #'(lambda ,lambda-list (declare (ignorable ,(first lambda-list))) ,@body)))
+ 
+ (defun copy-type-propagator (orig dest-list)
+   (loop with function = (gethash orig *p0-dispatch-table*)
+
+Missing argument to LOGAND.
+
+diff --git a/src/cmp/cmpopt-bits.lsp b/src/cmp/cmpopt-bits.lsp
+index f097e19..0e27fbc 100644
+--- a/src/cmp/cmpopt-bits.lsp
++++ b/src/cmp/cmpopt-bits.lsp
+@@ -75,7 +75,7 @@
+ ;;; TYPE PROPAGATION
+ ;;;
+ 
+-(def-type-propagator logand (&rest args)
++(def-type-propagator logand (fname &rest args)
+   (values args
+ 	  (if args
+ 	      (dolist (int-type '((UNSIGNED-BYTE 8) FIXNUM) 'integer)
+
+Some statements from si::bc-disassemble were written to the wrong stream.
+
+diff --git a/src/c/disassembler.d b/src/c/disassembler.d
+index c45bc29..4680982 100644
+--- a/src/c/disassembler.d
++++ b/src/c/disassembler.d
+@@ -156,10 +156,10 @@ disassemble_tagbody(cl_object bytecodes, cl_opcode *vector) {
+ 	print_noarg("TAGBODY");
+ 	for (i=0; i<ntags; i++) {
+ 		GET_LABEL(destination, vector);
+-		ecl_princ_str("\n\tTAG\t", ECL_T);
+-		ecl_princ(ecl_make_fixnum(i), ECL_T);
+-		ecl_princ_str(" @@ ", ECL_T);
+-		ecl_princ(ecl_make_fixnum(destination - base), ECL_T);
++		ecl_princ_str("\n\tTAG\t", ECL_NIL);
++		ecl_princ(ecl_make_fixnum(i), ECL_NIL);
++		ecl_princ_str(" @@ ", ECL_NIL);
++		ecl_princ(ecl_make_fixnum(destination - base), ECL_NIL);
+ 	}
+ 	vector = disassemble(bytecodes, vector);
+ 	print_noarg("\t\t; tagbody");
+@@ -189,9 +189,9 @@ disassemble(cl_object bytecodes, cl_opcode *vector) {
+ 	if (line_format != ECL_NIL) {
+ 		cl_format(3, ECL_T, line_format, line_no);
+ 	} else {
+-		ecl_princ_char('\n', ECL_T);
+-		ecl_princ(line_no, ECL_T);
+-		ecl_princ_char('\t', ECL_T);
++		ecl_princ_char('\n', ECL_NIL);
++		ecl_princ(line_no, ECL_NIL);
++		ecl_princ_char('\t', ECL_NIL);
+ 	}
+ 	switch (GET_OPCODE(vector)) {
+ 

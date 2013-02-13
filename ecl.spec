@@ -1,6 +1,6 @@
 Name:           ecl
 Version:        12.12.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
@@ -156,6 +156,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
 
 
 %changelog
+* Wed Feb 13 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 12.12.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
+
 * Thu Dec 20 2012 Jerry James <loganjerry@gmail.com> - 12.12.1-3
 - BR libatomic_ops-static instead of -devel (bz 889173)
 - Pull in upstream patches for bugs discovered post-release

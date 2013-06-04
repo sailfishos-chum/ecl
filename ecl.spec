@@ -1,6 +1,6 @@
 Name:           ecl
-Version:        12.12.1
-Release:        4%{?dist}
+Version:        13.5.1
+Release:        1%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
@@ -11,7 +11,7 @@ Source0:        http://downloads.sourceforge.net/ecls/%{name}-%{version}.tgz
 # the manual tarball:
 #   git clone git://ecls.git.sourceforge.net/gitroot/ecls/ecl-doc
 #   cd ecl-doc
-#   git checkout 3af1c1eaec1a3cb590c0ce140f881f48be19995e
+#   git checkout 5d2657b5b32a2b5df701ba1ffa768e3e05816b70
 #   rm -fr .git
 #   cd ..
 #   tar cJf ecl-doc.tar.xz ecl-doc
@@ -23,18 +23,19 @@ Source3:        %{name}.svg
 # This patch was sent upstream on 4 Feb 2012.  It fixes a few warnings
 # from the C compiler that indicate situations that might be dangerous at
 # runtime.
-Patch0:         %{name}-12.12.1-warnings.patch
+Patch0:         %{name}-13.5.1-warnings.patch
 # Do not use a separate thread to handle signals by default if built with
 # boehm-gc support.
 # This prevents a deadlock when building maxima with ecl support in
 # fedora, and should handle by default these problems:
 # http://trac.sagemath.org/sage_trac/ticket/11752
 # http://www.mail-archive.com/ecls-list@lists.sourceforge.net/msg00644.html
-Patch1:         %{name}-12.12.1-signal_handling_thread.patch
-# Bug-fixing patches cherry picked from upstream's git.
-Patch2:         %{name}-12.12.1-fixes.patch
-# Work around xsltproc requiring namespace declarations for entities.
-Patch3:         %{name}-12.12.1-xsltproc.patch
+Patch1:         %{name}-13.5.1-signal_handling_thread.patch
+# Work around xsltproc requiring namespace declarations for entities.  This
+# patch was sent upstream 3 Jun 2013.
+Patch2:         %{name}-12.12.1-xsltproc.patch
+# GCC does not implement support for #pragma STDC FENV_ACCESS
+Patch3:         %{name}-13.5.1-fenv-access.patch
 
 BuildRequires:  libX11-devel
 BuildRequires:  pkgconfig
@@ -73,7 +74,7 @@ Gray streams.
 %setup -q -T -D -a 1
 %patch0
 %patch1
-%patch2 -p1
+%patch2
 %patch3
 
 # Remove spurious executable bits
@@ -88,7 +89,7 @@ find src/h -type f -perm /0111 | xargs chmod a-x
 %ifarch x86_64
   --with-sse \
 %endif
-  CPPFLAGS=`pkg-config --cflags libffi`
+  CPPFLAGS=`pkg-config --cflags libffi` CFLAGS="-std=gnu99 %{optflags}"
 make
 mkdir -p ecl-doc/tmp
 make -C ecl-doc
@@ -146,8 +147,8 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
 %{_datadir}/applications/ecl.desktop
 %{_datadir}/icons/hicolor/scalable/apps/ecl.svg
 %{_libdir}/ecl*
-%{_libdir}/libecl.so.12.12*
-%{_libdir}/libecl.so.12
+%{_libdir}/libecl.so.13.5*
+%{_libdir}/libecl.so.13
 %{_libdir}/libecl.so
 %{_includedir}/ecl
 %{_mandir}/man1/*
@@ -156,6 +157,11 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
 
 
 %changelog
+* Mon Jun  3 2013 Jerry James <loganjerry@gmail.com> - 13.5.1-1
+- New upstream release
+- Drop upstreamed -fixes patch
+- Add -fenv-access patch to work around a GCC limitation
+
 * Wed Feb 13 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 12.12.1-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
 

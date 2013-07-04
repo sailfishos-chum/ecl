@@ -1,6 +1,6 @@
 Name:           ecl
 Version:        13.5.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
@@ -158,6 +158,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
 
 
 %changelog
+* Wed Jul  3 2013 Jerry James <loganjerry@gmail.com> - 13.5.1-2
+- Update -warnings patch with more fixes from upstream
+
 * Mon Jun  3 2013 Jerry James <loganjerry@gmail.com> - 13.5.1-1
 - New upstream release
 - Drop upstreamed -fixes patch

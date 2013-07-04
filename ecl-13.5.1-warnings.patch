@@ -146,8 +146,82 @@
  	if (!Null(user)) {
  #ifdef HAVE_PWD_H
  		struct passwd *pwent = NULL;
---- src/cmp/cmpwt.lsp.orig	2013-05-27 14:37:36.000000000 -0600
-+++ src/cmp/cmpwt.lsp	2013-06-03 14:53:45.012149692 -0600
+--- ./src/clos/conditions.lsp.orig	2013-05-27 14:37:36.000000000 -0600
++++ ./src/clos/conditions.lsp	2013-06-27 13:05:42.397323302 -0600
+@@ -96,7 +96,7 @@
+     (cons (loop for i from 1
+ 	     for n in (if (atom names) (list names) names)
+ 	     for f = (simple-restart-function tag i)
+-	     collect (cons name f))
++	     collect (cons n f))
+ 	  *handler-clusters*)))
+ 
+ (defmacro restart-bind (bindings &body forms)
+--- ./src/cmp/cmpcatch.lsp.orig	2013-05-27 14:37:36.000000000 -0600
++++ ./src/cmp/cmpcatch.lsp	2013-06-27 10:37:19.665384986 -0600
+@@ -74,6 +74,7 @@
+     (let ((*unwind-exit* (cons 'FRAME *unwind-exit*))
+ 	  (*destination* 'VALUES))
+       (c2expr* form))
++    (wt-nl "  next_fr = NULL;")
+     (wt-nl "}")
+     (wt-nl "ecl_frs_pop(cl_env_copy);")
+     ;; Here we save the values of the form which might have been
+--- ./src/cmp/cmpmain.lsp.orig	2013-05-27 14:37:36.000000000 -0600
++++ ./src/cmp/cmpmain.lsp	2013-06-27 09:19:40.694782790 -0600
+@@ -269,7 +269,8 @@ void ~A(cl_object cblock)
+ 	Cblock->cblock.next = current;
+ }
+ 	~A
+-}")
++}
++")
+ 
+ (defconstant +lisp-program-main+ "
+ extern int
+@@ -282,7 +283,8 @@ main(int argc, char **argv)
+ 	~A
+ 	} ECL_CATCH_ALL_END;
+ 	si_exit(0);
+-}")
++}
++")
+ 
+ (defconstant +lisp-library-main+ "
+ extern int
+@@ -294,7 +296,8 @@ extern int
+ 	ecl_init_module(OBJNULL, ~A);
+ 	~A
+ 	} ECL_CATCH_ALL_END;
+-}")
++}
++")
+ 
+ #+:win32
+ (defconstant +lisp-program-winmain+ "
+@@ -312,7 +315,8 @@ WinMain(HINSTANCE hInstance, HINSTANCE h
+ 	~A
+ 	} ECL_CATCH_ALL_END;
+ 	si_exit(0);
+-}")
++}
++")
+ 
+ (defun guess-kind (pathname)
+   "Given a file name, guess whether it is an object file, a library, a program
+--- ./src/cmp/cmptop.lsp.orig	2013-05-27 14:37:36.000000000 -0600
++++ ./src/cmp/cmptop.lsp	2013-06-27 10:45:20.056839502 -0600
+@@ -436,7 +436,7 @@
+     (wt-nl "volatile cl_object lex" *level* "[" *max-lex* "];"))
+   (when (plusp *max-env*)
+     (unless (eq closure-type 'CLOSURE)
+-      (wt-nl "cl_object " *volatile* "env0;"))
++      (wt-nl "cl_object " *volatile* "env0 = ECL_NIL;"))
+     ;; Note that the closure structure has to be marked volatile
+     ;; or else GCC may optimize away writes into it because it
+     ;; does not know it shared with the rest of the world.
+--- ./src/cmp/cmpwt.lsp.orig	2013-05-27 14:37:36.000000000 -0600
++++ ./src/cmp/cmpwt.lsp	2013-06-03 14:53:45.012149692 -0600
 @@ -103,10 +103,10 @@
  		    (*wt-data-column* 80)
  		    (s (with-output-to-string (stream)
@@ -213,7 +287,7 @@
                                            ecl_times(approx->s, e2)))
                                  position = ecl_one_minus(position);
 --- ./src/h/ecl-inl.h.orig	2013-05-27 14:37:36.000000000 -0600
-+++ ./src/h/ecl-inl.h	2013-06-03 14:00:36.478427687 -0600
++++ ./src/h/ecl-inl.h	2013-06-27 10:30:15.113848605 -0600
 @@ -73,11 +73,11 @@
                  cl_fixnum padding[(sizeof(struct ecl_base_string)+3)/4*4]; \
          } name[]
@@ -228,3 +302,23 @@
  
  #define ecl_def_ct_base_string(name,chars,len,static,const)     \
          static const struct ecl_base_string name ## _data = {    \
+@@ -120,7 +120,7 @@
+         static const struct ecl_vector name ## _data = {                 \
+                 (int8_t)t_vector, 0, (type), 0,                         \
+                 ECL_NIL, (cl_index)(len), (cl_index)(len),                 \
+-                ecl_cast_ptr(cl_object*,raw), 0 };                      \
++                { ecl_cast_ptr(cl_object*,raw) }, 0 };                  \
+         static const cl_object name = (cl_object)(& name ## _data)
+ 
+ #ifdef ECL_SSE2
+--- ./src/h/stacks.h.orig	2013-05-27 14:37:36.000000000 -0600
++++ ./src/h/stacks.h	2013-06-27 10:40:25.930183977 -0600
+@@ -387,7 +387,7 @@
+ 	} else {
+ 
+ #define ECL_UNWIND_PROTECT_EXIT \
+-	__unwinding=0; } \
++	__unwinding=0; __next_fr=NULL; } \
+ 	ecl_frs_pop(__the_env); \
+ 	__nr = ecl_stack_push_values(__the_env);
+ 

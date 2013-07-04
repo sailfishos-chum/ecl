@@ -89,7 +89,8 @@ find src/h -type f -perm /0111 | xargs chmod a-x
 %ifarch x86_64
   --with-sse \
 %endif
-  CPPFLAGS=`pkg-config --cflags libffi` CFLAGS="-std=gnu99 %{optflags}"
+  CPPFLAGS=`pkg-config --cflags libffi` \
+  CFLAGS="%{optflags} -std=gnu99 -Wno-unused -Wno-return-type"
 make
 mkdir -p ecl-doc/tmp
 make -C ecl-doc

@@ -1,6 +1,6 @@
 Name:           ecl
 Version:        13.5.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
@@ -158,6 +158,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
 
 
 %changelog
+* Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 13.5.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
+
 * Wed Jul  3 2013 Jerry James <loganjerry@gmail.com> - 13.5.1-2
 - Update -warnings patch with more fixes from upstream
 

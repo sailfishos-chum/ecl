@@ -1,0 +1,73 @@
+From 285eb31812bc7c2c48a8b1bbe14e01084ba92b05 Mon Sep 17 00:00:00 2001
+From: D Herring <dherring@at.tentpost.dot.com>
+Date: Fri, 20 Dec 2013 01:15:59 -0500
+Subject: [PATCH 66/92] fixes for the detection of GC_start_call_back
+
+- HAVE_GC_SET_START_CALLBACK was defined unconditionally
+- there was no AC_DEFINE if system_boehm was false
+- there was a typo in one usage site of this macro
+
+see 6b754564f1d1a2d320b1fd46f0c0da2e623862c1
+---
+ src/aclocal.m4    | 2 ++
+ src/c/alloc_2.d   | 2 +-
+ src/configure     | 3 +++
+ src/h/config.h.in | 2 +-
+ 4 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/src/aclocal.m4 b/src/aclocal.m4
+index 19c4115..d49321a 100644
+--- a/src/aclocal.m4
++++ b/src/aclocal.m4
+@@ -948,6 +948,8 @@ if test "${enable_boehm}" = auto -o "${enable_boehm}" = system; then
+  if test "${system_boehm}" = "yes"; then
+    AC_CHECK_LIB( [gc], [GC_set_start_callback],
+                  [AC_DEFINE(HAVE_GC_SET_START_CALLBACK)], [] )
++ else
++  AC_DEFINE(HAVE_GC_SET_START_CALLBACK)
+  fi
+  AC_MSG_CHECKING( [whether we can use the existing Boehm-Weiser library] )
+  AC_MSG_RESULT( [${system_boehm}] )
+diff --git a/src/c/alloc_2.d b/src/c/alloc_2.d
+index 75e7080..51366fd 100644
+--- a/src/c/alloc_2.d
++++ b/src/c/alloc_2.d
+@@ -32,7 +32,7 @@
+ #ifdef GBC_BOEHM
+ 
+ static void (*GC_old_start_callback)(void) = NULL;
+-#ifdef HAVE_GC_START_CALLBACK
++#ifdef HAVE_GC_SET_START_CALLBACK
+ extern void GC_set_start_callback(void *);
+ extern void *GC_get_start_callback(void *);
+ #else
+diff --git a/src/configure b/src/configure
+index 999231a..159f82f 100755
+--- a/src/configure
++++ b/src/configure
+@@ -5970,6 +5970,9 @@ if test "x$ac_cv_lib_gc_GC_set_start_callback" = xyes; then :
+ 
+ fi
+ 
++ else
++  $as_echo "#define HAVE_GC_SET_START_CALLBACK 1" >>confdefs.h
++
+  fi
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we can use the existing Boehm-Weiser library " >&5
+ $as_echo_n "checking whether we can use the existing Boehm-Weiser library ... " >&6; }
+diff --git a/src/h/config.h.in b/src/h/config.h.in
+index f6b6b8d..169049e 100644
+--- a/src/h/config.h.in
++++ b/src/h/config.h.in
+@@ -309,7 +309,7 @@ typedef unsigned char ecl_base_char;
+ #endif
+ 
+ /* GC_set_start_callback						*/
+-#define HAVE_GC_SET_START_CALLBACK
++#undef HAVE_GC_SET_START_CALLBACK
+ 
+ /*
+  * SYSTEM FEATURES:
+-- 
+1.9.0
+

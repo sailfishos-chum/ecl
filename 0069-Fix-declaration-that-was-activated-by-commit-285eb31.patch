@@ -1,0 +1,26 @@
+From 3e9f5cafe1c2a1f8c3c259aec5b74948bcd85f56 Mon Sep 17 00:00:00 2001
+From: Philipp Marek <philipp@marek.priv.at>
+Date: Thu, 27 Feb 2014 20:47:53 +0100
+Subject: [PATCH 69/92] Fix declaration that was activated by commit 285eb318, 
+  "fixes for the detection of GC_start_call_back"
+
+---
+ src/c/alloc_2.d | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/c/alloc_2.d b/src/c/alloc_2.d
+index 51366fd..727539a 100644
+--- a/src/c/alloc_2.d
++++ b/src/c/alloc_2.d
+@@ -34,7 +34,7 @@
+ static void (*GC_old_start_callback)(void) = NULL;
+ #ifdef HAVE_GC_SET_START_CALLBACK
+ extern void GC_set_start_callback(void *);
+-extern void *GC_get_start_callback(void *);
++extern void *GC_get_start_callback();
+ #else
+ extern void (*GC_start_call_back)(void);
+ #endif
+-- 
+1.9.0
+

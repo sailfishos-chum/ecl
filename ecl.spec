@@ -36,6 +36,13 @@ Patch1:         %{name}-13.5.1-signal_handling_thread.patch
 Patch2:         %{name}-12.12.1-xsltproc.patch
 # GCC does not implement support for #pragma STDC FENV_ACCESS
 Patch3:         %{name}-13.5.1-fenv-access.patch
+# upstream GC_start_call_back fixes (0025, 0026 only included so later patches apply without modification)
+Patch5:         0024-GC_start_call_back-disappeared-in-recent-versions-of.patch
+Patch6:         0025-In-Cygwin-x86_64-deactivate-the-assembly-code-in-GMP.patch
+Patch7:         0026-Configuring-GMP-with-C-with-c-gmp-was-broken-due-to-.patch
+Patch8:         0041-Fixed-declaration-of-GC_start_call_back.patch
+Patch9:         0066-fixes-for-the-detection-of-GC_start_call_back.patch
+Patch10:        0069-Fix-declaration-that-was-activated-by-commit-285eb31.patch
 
 BuildRequires:  libX11-devel
 BuildRequires:  pkgconfig
@@ -76,6 +83,12 @@ Gray streams.
 %patch1
 %patch2
 %patch3
+%patch5 -p1
+%patch6 -p1
+%patch7 -p1
+%patch8 -p1
+%patch9 -p1
+%patch10 -p1
 
 # Remove spurious executable bits
 chmod a-x src/CHANGELOG
@@ -159,7 +172,7 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
 
 %changelog
 * Wed May 14 2014 Rex Dieter <rdieter@fedoraproject.org> 13.5.1-4
-- rebuild (gc/libatomic_ops)
+- backport GC_start_call_back fixes
 
 * Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 13.5.1-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild

@@ -1,0 +1,102 @@
+From 6b754564f1d1a2d320b1fd46f0c0da2e623862c1 Mon Sep 17 00:00:00 2001
+From: Juanjo Garcia-Ripoll <jjgarcia@users.sf.net>
+Date: Sun, 6 Oct 2013 10:08:50 +0200
+Subject: [PATCH 24/92] GC_start_call_back disappeared in recent versions of
+ the GC library
+
+---
+ src/aclocal.m4    |  4 ++++
+ src/c/alloc_2.d   | 18 ++++++++++++++++--
+ src/h/config.h.in |  3 +++
+ 3 files changed, 23 insertions(+), 2 deletions(-)
+
+diff --git a/src/aclocal.m4 b/src/aclocal.m4
+index 1de1e92..28dce65 100644
+--- a/src/aclocal.m4
++++ b/src/aclocal.m4
+@@ -940,6 +940,10 @@ if test "${enable_boehm}" = auto -o "${enable_boehm}" = system; then
+      AC_CHECK_HEADER([gc/gc.h],[ECL_BOEHM_GC_HEADER='gc/gc.h'],[system_boehm=no],[])
+    fi
+  fi
++ if test "${system_boehm}" = "yes"; then
++   AC_CHECK_LIB( [gc], [GC_set_start_callback],
++                 [AC_DEFINE(HAVE_GC_SET_START_CALLBACK)], [] )
++ fi
+  AC_MSG_CHECKING( [whether we can use the existing Boehm-Weiser library] )
+  AC_MSG_RESULT( [${system_boehm}] )
+  if test "${system_boehm}" = "no"; then
+diff --git a/src/c/alloc_2.d b/src/c/alloc_2.d
+index 7bb4f52..5bc3572 100644
+--- a/src/c/alloc_2.d
++++ b/src/c/alloc_2.d
+@@ -31,6 +31,13 @@
+ 
+ #ifdef GBC_BOEHM
+ 
++static void (*GC_old_start_callback)(void) = NULL;
++#ifdef HAVE_GC_START_CALLBACK
++extern void GC_set_start_callback(void *);
++extern void *GC_get_start_callback(void *);
++#else
++extern void *GC_start_call_back(void);
++#endif
+ static void gather_statistics();
+ static void ecl_mark_env(struct cl_env_struct *env);
+ 
+@@ -750,7 +757,6 @@ ecl_dealloc(void *ptr)
+ static int alloc_initialized = FALSE;
+ 
+ extern void (*GC_push_other_roots)();
+-extern void (*GC_start_call_back)();
+ static void (*old_GC_push_other_roots)();
+ static void stacks_scanner();
+ 
+@@ -1090,7 +1096,13 @@ init_alloc(void)
+ #endif /* GBC_BOEHM_PRECISE */
+ 	old_GC_push_other_roots = GC_push_other_roots;
+ 	GC_push_other_roots = stacks_scanner;
++#ifdef HAVE_GC_SET_START_CALLBACK
++	GC_old_start_callback = GC_get_start_callback();
++	GC_set_start_callback(gather_statistics);
++#else
++	GC_old_start_callback = GC_start_call_back;
+ 	GC_start_call_back = (void (*)())gather_statistics;
++#endif
+ 	GC_java_finalization = 1;
+         GC_oom_fn = out_of_memory;
+         GC_set_warn_proc(no_warnings);
+@@ -1198,7 +1210,7 @@ si_set_finalizer(cl_object o, cl_object finalizer)
+ /* If we do not build our own version of the library, we do not have
+  * control over the existence of this variable.
+  */
+-#if 1 /*GBC_BOEHM == 0*/
++#if GBC_BOEHM == 0
+ extern int GC_print_stats;
+ #else
+ static int GC_print_stats;
+@@ -1277,6 +1289,8 @@ gather_statistics()
+ 			   cl_core.gc_counter->big.big_num,
+ 			   1);
+ 	}
++	if (GC_old_start_callback)
++		GC_old_start_callback();
+ }
+ 
+ 
+diff --git a/src/h/config.h.in b/src/h/config.h.in
+index 5dc851f..f6b6b8d 100644
+--- a/src/h/config.h.in
++++ b/src/h/config.h.in
+@@ -308,6 +308,9 @@ typedef unsigned char ecl_base_char;
+ #define ECL_WEAK_HASH
+ #endif
+ 
++/* GC_set_start_callback						*/
++#define HAVE_GC_SET_START_CALLBACK
++
+ /*
+  * SYSTEM FEATURES:
+  */
+-- 
+1.9.0
+

@@ -1,6 +1,6 @@
 Name:           ecl
 Version:        13.5.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
@@ -43,6 +43,8 @@ Patch7:         0026-Configuring-GMP-with-C-with-c-gmp-was-broken-due-to-.patch
 Patch8:         0041-Fixed-declaration-of-GC_start_call_back.patch
 Patch9:         0066-fixes-for-the-detection-of-GC_start_call_back.patch
 Patch10:        0069-Fix-declaration-that-was-activated-by-commit-285eb31.patch
+# fix when building with -Werror=format-security, upstreamable
+Patch11:         ecl-13.5.1-end_of_line.patch
 
 BuildRequires:  libX11-devel
 BuildRequires:  pkgconfig
@@ -89,6 +91,7 @@ Gray streams.
 %patch8 -p1
 %patch9 -p1
 %patch10 -p1
+%patch11 -p1
 
 # Remove spurious executable bits
 chmod a-x src/CHANGELOG
@@ -171,6 +174,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
 
 
 %changelog
+* Sun May 18 2014 Rex Dieter <rdieter@fedoraproject.org> 13.5.1-5
+- fix configure check for end-of-line when using -Werror=format-security
+
 * Wed May 14 2014 Rex Dieter <rdieter@fedoraproject.org> 13.5.1-4
 - backport GC_start_call_back fixes
 

@@ -1,6 +1,6 @@
 Name:           ecl
 Version:        13.5.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
@@ -174,6 +174,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
 
 
 %changelog
+* Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 13.5.1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
+
 * Sun May 18 2014 Rex Dieter <rdieter@fedoraproject.org> 13.5.1-5
 - fix configure check for end-of-line when using -Werror=format-security
 

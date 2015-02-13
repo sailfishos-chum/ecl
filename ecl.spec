@@ -1,6 +1,6 @@
 Name:           ecl
 Version:        13.5.1
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
@@ -169,11 +169,15 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
 %{_libdir}/libecl.so
 %{_includedir}/ecl
 %{_mandir}/man1/*
-%doc ANNOUNCEMENT Copyright LGPL examples src/CHANGELOG
-%doc ecl-doc/html src/doc/amop.txt src/doc/types-and-classes
+%doc ANNOUNCEMENT examples src/CHANGELOG ecl-doc/html
+%doc src/doc/amop.txt src/doc/types-and-classes
+%license Copyright LGPL
 
 
 %changelog
+* Fri Feb 13 2015 Jerry James <loganjerry@gmail.com> - 13.5.1-8
+- Use license macro
+
 * Sat Aug 16 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 13.5.1-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
 

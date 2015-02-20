@@ -1,0 +1,35 @@
+--- src/configure.orig	2015-02-19 21:00:00.000000000 -0700
++++ src/configure	2015-02-19 21:00:00.000000000 -0700
+@@ -7942,24 +7942,25 @@
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+ 
++#include <stddef.h>
+ #include <stdlib.h>
+ 
+-char *f2() {
++ptrdiff_t f2(const char *d) {
+   char c[2];
+-  return c;
++  return c-d;
+ }
+ 
+-char *f1() {
++ptrdiff_t f1(const char *d) {
+   char c[2];
+-  return c+1;
++  return c+1-d;
+ }
+ 
+-typedef char *(*f_ptr)();
++typedef ptrdiff_t (*f_ptr)(const char *);
+ f_ptr f[2] = { f1, f2 };
+ 
+-int signo() {
++ptrdiff_t signo() {
+   char d[1];
+-  return f[rand() & 1]() - d;
++  return f[rand() & 1](d);
+ }
+ 
+ int main() {

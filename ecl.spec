@@ -1,6 +1,6 @@
 Name:           ecl
 Version:        13.5.1
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
@@ -44,7 +44,9 @@ Patch8:         0041-Fixed-declaration-of-GC_start_call_back.patch
 Patch9:         0066-fixes-for-the-detection-of-GC_start_call_back.patch
 Patch10:        0069-Fix-declaration-that-was-activated-by-commit-285eb31.patch
 # fix when building with -Werror=format-security, upstreamable
-Patch11:         ecl-13.5.1-end_of_line.patch
+Patch11:        %{name}-13.5.1-end_of_line.patch
+# Fix stack direction detection; sent upstream 20 Feb 2015.
+Patch12:        %{name}-13.5.1-stack-direction.patch
 
 BuildRequires:  libX11-devel
 BuildRequires:  pkgconfig
@@ -92,6 +94,7 @@ Gray streams.
 %patch9 -p1
 %patch10 -p1
 %patch11 -p1
+%patch12
 
 # Remove spurious executable bits
 chmod a-x src/CHANGELOG
@@ -175,6 +178,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
 
 
 %changelog
+* Fri Feb 20 2015 Jerry James <loganjerry@gmail.com> - 13.5.1-9
+- Fix stack direction detection (broken with gcc 5)
+
 * Fri Feb 13 2015 Jerry James <loganjerry@gmail.com> - 13.5.1-8
 - Use license macro
 

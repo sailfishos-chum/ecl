@@ -1,6 +1,6 @@
 Name:           ecl
 Version:        13.5.1
-Release:        9%{?dist}
+Release:        10%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
@@ -178,6 +178,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
 
 
 %changelog
+* Wed Jun 17 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 13.5.1-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
+
 * Fri Feb 20 2015 Jerry James <loganjerry@gmail.com> - 13.5.1-9
 - Fix stack direction detection (broken with gcc 5)
 

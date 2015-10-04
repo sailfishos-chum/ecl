@@ -1,0 +1,22 @@
+--- ./src/aclocal.m4.orig	2015-08-24 00:41:27.000000000 -0600
++++ ./src/aclocal.m4	2015-10-03 16:17:51.295662880 -0600
+@@ -713,7 +713,7 @@ int main() {
+   fclose(f);
+   f = fopen("conftestval","w");
+   if (f == NULL) exit(1);
+-  fprintf(f, output);
++  fputs(output, f);
+   fclose(f);
+   exit(0);
+ }
+--- ./src/configure.orig	2015-08-24 00:41:27.000000000 -0600
++++ ./src/configure	2015-10-03 16:18:17.543574538 -0600
+@@ -7779,7 +7779,7 @@ int main() {
+   fclose(f);
+   f = fopen("conftestval","w");
+   if (f == NULL) exit(1);
+-  fprintf(f, output);
++  fputs(output, f);
+   fclose(f);
+   exit(0);
+ }

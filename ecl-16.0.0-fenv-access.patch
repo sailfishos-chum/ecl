@@ -1,5 +1,5 @@
---- ./src/c/Makefile.in.orig	2013-05-27 14:37:36.000000000 -0600
-+++ ./src/c/Makefile.in	2013-06-03 15:51:53.999362928 -0600
+--- ./src/c/Makefile.in.orig	2015-08-24 00:41:27.000000000 -0600
++++ ./src/c/Makefile.in	2015-10-03 16:10:29.941777969 -0600
 @@ -80,6 +80,29 @@ all:	$(DPP) ../libeclmin.a ../cinit.o
  .d.o: $(DPP)
  	if test -f ../CROSS-DPP ; then ../CROSS-DPP $< $@.c ; else $(DPP) $< $@.c ; fi

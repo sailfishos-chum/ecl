@@ -1,18 +1,18 @@
 Name:           ecl
-Version:        13.5.1
-Release:        10%{?dist}
+Version:        16.0.0
+Release:        1%{?dist}
 Summary:        Embeddable Common-Lisp
 
 Group:          Development/Languages
 License:        LGPLv2+ and BSD and MIT and Public Domain
-URL:            http://ecls.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/ecls/%{name}-%{version}.tgz
+URL:            https://common-lisp.net/project/ecl/
+Source0:        https://common-lisp.net/project/ecl/files/%{name}-%{version}.tgz
 # The manual has not yet been released.  Use the following commands to generate
 # the manual tarball:
-#   git clone git://ecls.git.sourceforge.net/gitroot/ecls/ecl-doc
+#   git clone https://gitlab.com/embeddable-common-lisp/ecl-doc.git
 #   cd ecl-doc
-#   git checkout 5d2657b5b32a2b5df701ba1ffa768e3e05816b70
-#   rm -fr .git
+#   git checkout a0bab55012b31416dfc8b36da75745a2a7a71621
+#   rm -fr .git*
 #   cd ..
 #   tar cJf ecl-doc.tar.xz ecl-doc
 Source1:        %{name}-doc.tar.xz
@@ -23,30 +23,18 @@ Source3:        %{name}.svg
 # This patch was sent upstream on 4 Feb 2012.  It fixes a few warnings
 # from the C compiler that indicate situations that might be dangerous at
 # runtime.
-Patch0:         %{name}-13.5.1-warnings.patch
+Patch0:         %{name}-16.0.0-warnings.patch
 # Do not use a separate thread to handle signals by default if built with
 # boehm-gc support.
 # This prevents a deadlock when building maxima with ecl support in
 # fedora, and should handle by default these problems:
 # http://trac.sagemath.org/sage_trac/ticket/11752
 # http://www.mail-archive.com/ecls-list@lists.sourceforge.net/msg00644.html
-Patch1:         %{name}-13.5.1-signal_handling_thread.patch
-# Work around xsltproc requiring namespace declarations for entities.  This
-# patch was sent upstream 3 Jun 2013.
-Patch2:         %{name}-12.12.1-xsltproc.patch
+Patch1:         %{name}-16.0.0-signal_handling_thread.patch
 # GCC does not implement support for #pragma STDC FENV_ACCESS
-Patch3:         %{name}-13.5.1-fenv-access.patch
-# upstream GC_start_call_back fixes (0025, 0026 only included so later patches apply without modification)
-Patch5:         0024-GC_start_call_back-disappeared-in-recent-versions-of.patch
-Patch6:         0025-In-Cygwin-x86_64-deactivate-the-assembly-code-in-GMP.patch
-Patch7:         0026-Configuring-GMP-with-C-with-c-gmp-was-broken-due-to-.patch
-Patch8:         0041-Fixed-declaration-of-GC_start_call_back.patch
-Patch9:         0066-fixes-for-the-detection-of-GC_start_call_back.patch
-Patch10:        0069-Fix-declaration-that-was-activated-by-commit-285eb31.patch
+Patch2:         %{name}-16.0.0-fenv-access.patch
 # fix when building with -Werror=format-security, upstreamable
-Patch11:        %{name}-13.5.1-end_of_line.patch
-# Fix stack direction detection; sent upstream 20 Feb 2015.
-Patch12:        %{name}-13.5.1-stack-direction.patch
+Patch3:         %{name}-16.0.0-end_of_line.patch
 
 BuildRequires:  libX11-devel
 BuildRequires:  pkgconfig
@@ -87,17 +75,8 @@ Gray streams.
 %patch1
 %patch2
 %patch3
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
-%patch11 -p1
-%patch12
 
 # Remove spurious executable bits
-chmod a-x src/CHANGELOG
 find src/c -type f -perm /0111 | xargs chmod a-x
 find src/h -type f -perm /0111 | xargs chmod a-x
 
@@ -108,8 +87,8 @@ find src/h -type f -perm /0111 | xargs chmod a-x
 %ifarch x86_64
   --with-sse \
 %endif
-  CPPFLAGS=`pkg-config --cflags libffi` \
-  CFLAGS="%{optflags} -std=gnu99 -Wno-unused -Wno-return-type"
+  CPPFLAGS=$(pkg-config --cflags libffi) \
+  CFLAGS="%{optflags} -Wno-unused -Wno-return-type"
 make
 mkdir -p ecl-doc/tmp
 make -C ecl-doc
@@ -167,17 +146,21 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
 %{_datadir}/applications/ecl.desktop
 %{_datadir}/icons/hicolor/scalable/apps/ecl.svg
 %{_libdir}/ecl*
-%{_libdir}/libecl.so.13.5*
-%{_libdir}/libecl.so.13
+%{_libdir}/libecl.so.16.0*
+%{_libdir}/libecl.so.16
 %{_libdir}/libecl.so
 %{_includedir}/ecl
 %{_mandir}/man1/*
-%doc ANNOUNCEMENT examples src/CHANGELOG ecl-doc/html
+%doc examples CHANGELOG ecl-doc/html
 %doc src/doc/amop.txt src/doc/types-and-classes
 %license Copyright LGPL
 
 
 %changelog
+* Sat Oct  3 2015 Jerry James <loganjerry@gmail.com> - 16.0.0-1
+- New upstream release
+- Drop many upstreamed patches
+
 * Wed Jun 17 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 13.5.1-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
 

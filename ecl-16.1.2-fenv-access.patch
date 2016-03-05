@@ -1,0 +1,32 @@
+--- src/c/Makefile.in.orig	2016-02-25 00:06:19.000000000 -0700
++++ src/c/Makefile.in	2016-03-04 17:23:49.062402836 -0700
+@@ -84,6 +84,29 @@ all:	$(DPP) ../libeclmin.a ../cinit.o
+ .d.o: $(DPP)
+ 	if test -f ../CROSS-DPP ; then ../CROSS-DPP $< $@.c ; else $(DPP) $< $@.c ; fi
+ 	$(CC) -DECLDIR="\"@ecldir@\"" $(CFLAGS) -o $@ $@.c
++# GCC doesn't understand #pragma STDC FENV_ACCESS ON, so we do this instead:
++numbers/atan.o: numbers/atan.c
++	$(CC) -DECLDIR="\"@ecldir@\"" $(CFLAGS) -frounding-math -fsignaling-nans -o $@ $<
++numbers/cos.o: numbers/cos.c
++	$(CC) -DECLDIR="\"@ecldir@\"" $(CFLAGS) -frounding-math -fsignaling-nans -o $@ $<
++numbers/cosh.o: numbers/cosh.c
++	$(CC) -DECLDIR="\"@ecldir@\"" $(CFLAGS) -frounding-math -fsignaling-nans -o $@ $<
++numbers/exp.o: numbers/exp.c
++	$(CC) -DECLDIR="\"@ecldir@\"" $(CFLAGS) -frounding-math -fsignaling-nans -o $@ $<
++numbers/expt.o: numbers/expt.c
++	$(CC) -DECLDIR="\"@ecldir@\"" $(CFLAGS) -frounding-math -fsignaling-nans -o $@ $<
++numbers/log.o: numbers/log.c
++	$(CC) -DECLDIR="\"@ecldir@\"" $(CFLAGS) -frounding-math -fsignaling-nans -o $@ $<
++numbers/sin.o: numbers/sin.c
++	$(CC) -DECLDIR="\"@ecldir@\"" $(CFLAGS) -frounding-math -fsignaling-nans -o $@ $<
++numbers/sinh.o: numbers/sinh.c
++	$(CC) -DECLDIR="\"@ecldir@\"" $(CFLAGS) -frounding-math -fsignaling-nans -o $@ $<
++numbers/sqrt.o: numbers/sqrt.c
++	$(CC) -DECLDIR="\"@ecldir@\"" $(CFLAGS) -frounding-math -fsignaling-nans -o $@ $<
++numbers/tan.o: numbers/tan.c
++	$(CC) -DECLDIR="\"@ecldir@\"" $(CFLAGS) -frounding-math -fsignaling-nans -o $@ $<
++numbers/tanh.o: numbers/tanh.c
++	$(CC) -DECLDIR="\"@ecldir@\"" $(CFLAGS) -frounding-math -fsignaling-nans -o $@ $<
+ .c.o:
+ 	$(CC) -DECLDIR="\"@ecldir@\"" $(CFLAGS) -o $@ $<
+ .d.s: $(HFILES)

@@ -1,9 +1,8 @@
 Name:           ecl
-Version:        16.0.0
-Release:        2%{?dist}
+Version:        16.1.2
+Release:        1%{?dist}
 Summary:        Embeddable Common-Lisp
 
-Group:          Development/Languages
 License:        LGPLv2+ and BSD and MIT and Public Domain
 URL:            https://common-lisp.net/project/ecl/
 Source0:        https://common-lisp.net/project/ecl/files/%{name}-%{version}.tgz
@@ -23,18 +22,18 @@ Source3:        %{name}.svg
 # This patch was sent upstream on 4 Feb 2012.  It fixes a few warnings
 # from the C compiler that indicate situations that might be dangerous at
 # runtime.
-Patch0:         %{name}-16.0.0-warnings.patch
+Patch0:         %{name}-16.1.2-warnings.patch
 # Do not use a separate thread to handle signals by default if built with
 # boehm-gc support.
 # This prevents a deadlock when building maxima with ecl support in
 # fedora, and should handle by default these problems:
 # http://trac.sagemath.org/sage_trac/ticket/11752
 # http://www.mail-archive.com/ecls-list@lists.sourceforge.net/msg00644.html
-Patch1:         %{name}-16.0.0-signal_handling_thread.patch
+Patch1:         %{name}-16.1.2-signal_handling_thread.patch
 # GCC does not implement support for #pragma STDC FENV_ACCESS
-Patch2:         %{name}-16.0.0-fenv-access.patch
+Patch2:         %{name}-16.1.2-fenv-access.patch
 # fix when building with -Werror=format-security, upstreamable
-Patch3:         %{name}-16.0.0-end_of_line.patch
+Patch3:         %{name}-16.1.2-end_of_line.patch
 
 BuildRequires:  libX11-devel
 BuildRequires:  pkgconfig
@@ -146,17 +145,20 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
 %{_datadir}/applications/ecl.desktop
 %{_datadir}/icons/hicolor/scalable/apps/ecl.svg
 %{_libdir}/ecl*
-%{_libdir}/libecl.so.16.0*
+%{_libdir}/libecl.so.16.1*
 %{_libdir}/libecl.so.16
 %{_libdir}/libecl.so
 %{_includedir}/ecl
 %{_mandir}/man1/*
 %doc examples CHANGELOG ecl-doc/html
 %doc src/doc/amop.txt src/doc/types-and-classes
-%license Copyright LGPL
+%license LGPL LICENSE
 
 
 %changelog
+* Fri Mar  4 2016 Jerry James <loganjerry@gmail.com> - 16.1.2-1
+- New upstream release
+
 * Wed Feb 03 2016 Fedora Release Engineering <releng@fedoraproject.org> - 16.0.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
 

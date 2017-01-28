@@ -35,6 +35,7 @@ Patch2:         %{name}-16.1.2-fenv-access.patch
 # fix when building with -Werror=format-security, upstreamable
 Patch3:         %{name}-16.1.2-end_of_line.patch
 
+BuildRequires:  gcc
 BuildRequires:  libX11-devel
 BuildRequires:  pkgconfig
 BuildRequires:  gmp-devel
@@ -122,13 +123,11 @@ cp -p %{SOURCE3} $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/scalable/apps
 
 %post
 /sbin/ldconfig
-update-desktop-database -q >&/dev/null ||:
 touch --no-create %{_datadir}/icons/hicolor
 
  
 %postun
 /sbin/ldconfig
-update-desktop-database -q >&/dev/null ||:
 if [ $1 -eq 0 ]; then
   touch --no-create %{_datadir}/icons/hicolor
   gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:

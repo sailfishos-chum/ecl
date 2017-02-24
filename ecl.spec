@@ -1,11 +1,11 @@
 Name:           ecl
-Version:        16.1.2
-Release:        2%{?dist}
+Version:        16.1.3
+Release:        1%{?dist}
 Summary:        Embeddable Common-Lisp
 
 License:        LGPLv2+ and BSD and MIT and Public Domain
 URL:            https://common-lisp.net/project/ecl/
-Source0:        https://common-lisp.net/project/ecl/files/%{name}-%{version}.tgz
+Source0:        https://common-lisp.net/project/ecl/static/files/release/%{name}-%{version}.tgz
 # The manual has not yet been released.  Use the following commands to generate
 # the manual tarball:
 #   git clone https://gitlab.com/embeddable-common-lisp/ecl-doc.git
@@ -22,18 +22,22 @@ Source3:        %{name}.svg
 # This patch was sent upstream on 4 Feb 2012.  It fixes a few warnings
 # from the C compiler that indicate situations that might be dangerous at
 # runtime.
-Patch0:         %{name}-16.1.2-warnings.patch
+Patch0:         %{name}-16.1.3-warnings.patch
 # Do not use a separate thread to handle signals by default if built with
 # boehm-gc support.
 # This prevents a deadlock when building maxima with ecl support in
 # fedora, and should handle by default these problems:
 # http://trac.sagemath.org/sage_trac/ticket/11752
 # http://www.mail-archive.com/ecls-list@lists.sourceforge.net/msg00644.html
-Patch1:         %{name}-16.1.2-signal_handling_thread.patch
+Patch1:         %{name}-16.1.3-signal_handling_thread.patch
 # GCC does not implement support for #pragma STDC FENV_ACCESS
-Patch2:         %{name}-16.1.2-fenv-access.patch
+Patch2:         %{name}-16.1.3-fenv-access.patch
 # fix when building with -Werror=format-security, upstreamable
-Patch3:         %{name}-16.1.2-end_of_line.patch
+Patch3:         %{name}-16.1.3-end_of_line.patch
+# Upstream patch to fix the SSE printer
+Patch4:         %{name}-16.1.3-sse-printer.patch
+# Upstream patch to fix maxima test failure with atan with signed zero
+Patch5:         %{name}-16.1.3-atan.patch
 
 BuildRequires:  gcc
 BuildRequires:  libX11-devel
@@ -75,20 +79,23 @@ Gray streams.
 %patch1
 %patch2
 %patch3
+%patch4
+%patch5
 
 # Remove spurious executable bits
 find src/c -type f -perm /0111 | xargs chmod a-x
 find src/h -type f -perm /0111 | xargs chmod a-x
 
+# Temporary fix for missing braces in initializers, causes build failure
+sed -i 's/{.*,.*,.*,.*,.*}/{&}/g' src/c/symbols_list.h
+sed -i 's/{.*,.*,.*,.*}/{&}/g' src/c/unicode/ucd_names_pair.c
+
 
 %build
 %configure --enable-unicode=yes --enable-c99complex --enable-threads=yes \
-  --with-__thread --with-clx --disable-rpath \
-%ifarch x86_64
-  --with-sse \
-%endif
+  --with-__thread --with-clx --disable-rpath --with-sse=auto \
   CPPFLAGS=$(pkg-config --cflags libffi) \
-  CFLAGS="%{optflags} -Wno-unused -Wno-return-type"
+  CFLAGS="%{optflags} -Wno-unused -Wno-return-type -Wno-unknown-pragmas"
 make
 mkdir -p ecl-doc/tmp
 make -C ecl-doc
@@ -151,10 +158,13 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
 %{_mandir}/man1/*
 %doc examples CHANGELOG ecl-doc/html
 %doc src/doc/amop.txt src/doc/types-and-classes
-%license LGPL LICENSE
+%license COPYING LICENSE
 
 
 %changelog
+* Fri Feb 24 2017 Jerry James <loganjerry@gmail.com> - 16.1.3-1
+- New upstream release
+
 * Fri Feb 10 2017 Fedora Release Engineering <releng@fedoraproject.org> - 16.1.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
 

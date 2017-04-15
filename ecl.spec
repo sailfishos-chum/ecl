@@ -14,11 +14,11 @@ Source0:        https://common-lisp.net/project/ecl/static/files/release/%{name}
 #   rm -fr .git*
 #   cd ..
 #   tar cJf ecl-doc.tar.xz ecl-doc
-Source1:        %{name}-doc.tar.xz
-Source2:        %{name}.desktop
+#Source1:        %{name}-doc.tar.xz
+#Source2:        %{name}.desktop
 # A modified version of src/util/ecl.svg with extra whitespace removed.  The
 # extra whitespace made the icon appear very small and shoved into a corner.
-Source3:        %{name}.svg
+#Source3:        %{name}.svg
 # This patch was sent upstream on 4 Feb 2012.  It fixes a few warnings
 # from the C compiler that indicate situations that might be dangerous at
 # runtime.
@@ -40,24 +40,24 @@ Patch4:         %{name}-16.1.3-sse-printer.patch
 Patch5:         %{name}-16.1.3-atan.patch
 
 BuildRequires:  gcc
-BuildRequires:  libX11-devel
+#BuildRequires:  libX11-devel
 BuildRequires:  pkgconfig
 BuildRequires:  gmp-devel
-BuildRequires:  gc-devel
-BuildRequires:  libatomic_ops-static
+#BuildRequires:  gc-devel
+#BuildRequires:  libatomic_ops-static
 BuildRequires:  libffi-devel
 BuildRequires:  emacs-common
-BuildRequires:  docbook5-schemas
-BuildRequires:  docbook5-style-xsl
-BuildRequires:  xmlto
-BuildRequires:  desktop-file-utils
+#BuildRequires:  docbook5-schemas
+#BuildRequires:  docbook5-style-xsl
+#BuildRequires:  xmlto
+#BuildRequires:  desktop-file-utils
 Requires:       gcc
 Requires:       libgcc%{?_isa}
 Requires:       glibc-devel%{?_isa}
-Requires:       gc-devel%{?_isa}
+#Requires:       gc-devel%{?_isa}
 Requires:       gmp-devel%{?_isa}
 Requires:       libffi-devel%{?_isa}
-Requires:       hicolor-icon-theme
+#Requires:       hicolor-icon-theme
 Requires(post): coreutils
 Requires(postun): coreutils
 
@@ -74,7 +74,7 @@ Gray streams.
 
 %prep
 %setup -q
-%setup -q -T -D -a 1
+#%setup -q -T -D -a 1
 %patch0
 %patch1
 %patch2
@@ -97,9 +97,9 @@ sed -i 's/{.*,.*,.*,.*}/{&}/g' src/c/unicode/ucd_names_pair.c
   CPPFLAGS=$(pkg-config --cflags libffi) \
   CFLAGS="%{optflags} -Wno-unused -Wno-return-type -Wno-unknown-pragmas"
 make
-mkdir -p ecl-doc/tmp
-make -C ecl-doc
-rm ecl-doc/html/ecl2.proc
+#mkdir -p ecl-doc/tmp
+#make -C ecl-doc
+#rm ecl-doc/html/ecl2.proc
 
 
 %install
@@ -111,54 +111,54 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/Copyright
 rm -f $RPM_BUILD_ROOT%{_libdir}/LGPL
 
 # Install the man pages
-mkdir -p $RPM_BUILD_ROOT%{_mandir}/man1
-sed -e "s|@bindir@|%{_bindir}|" src/doc/ecl.man.in > \
-  $RPM_BUILD_ROOT%{_mandir}/man1/ecl.1
-cp -p src/doc/ecl-config.man.in $RPM_BUILD_ROOT%{_mandir}/man1/ecl-config.1
+#mkdir -p $RPM_BUILD_ROOT%{_mandir}/man1
+#sed -e "s|@bindir@|%{_bindir}|" src/doc/ecl.man.in > \
+#  $RPM_BUILD_ROOT%{_mandir}/man1/ecl.1
+#cp -p src/doc/ecl-config.man.in $RPM_BUILD_ROOT%{_mandir}/man1/ecl-config.1
 
 # Add missing executable bits
 chmod a+x $RPM_BUILD_ROOT%{_libdir}/ecl-%{version}/dpp
 chmod a+x $RPM_BUILD_ROOT%{_libdir}/ecl-%{version}/ecl_min
 
 # Install the desktop file
-desktop-file-install --dir=$RPM_BUILD_ROOT%{_datadir}/applications %{SOURCE2}
+#desktop-file-install --dir=$RPM_BUILD_ROOT%{_datadir}/applications %{SOURCE2}
 
 # Install the desktop icon
-mkdir -p $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/scalable/apps
-cp -p %{SOURCE3} $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/scalable/apps
+#mkdir -p $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/scalable/apps
+#cp -p %{SOURCE3} $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/scalable/apps
 
 
 %post
 /sbin/ldconfig
-touch --no-create %{_datadir}/icons/hicolor
+#touch --no-create %{_datadir}/icons/hicolor
 
  
 %postun
 /sbin/ldconfig
-if [ $1 -eq 0 ]; then
-  touch --no-create %{_datadir}/icons/hicolor
-  gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
-fi
+#if [ $1 -eq 0 ]; then
+#  touch --no-create %{_datadir}/icons/hicolor
+#  gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
+#fi
 
 
-%posttrans
-gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
+#%posttrans
+#gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
 
 
 %files
 %{_bindir}/ecl
 %{_bindir}/ecl-config
-%{_datadir}/applications/ecl.desktop
-%{_datadir}/icons/hicolor/scalable/apps/ecl.svg
+#%{_datadir}/applications/ecl.desktop
+#%{_datadir}/icons/hicolor/scalable/apps/ecl.svg
 %{_libdir}/ecl*
 %{_libdir}/libecl.so.16.1*
 %{_libdir}/libecl.so.16
 %{_libdir}/libecl.so
 %{_includedir}/ecl
 %{_mandir}/man1/*
-%doc examples CHANGELOG ecl-doc/html
-%doc src/doc/amop.txt src/doc/types-and-classes
-%license COPYING LICENSE
+#%doc examples CHANGELOG ecl-doc/html
+#%doc src/doc/amop.txt src/doc/types-and-classes
+%doc COPYING LICENSE
 
 
 %changelog

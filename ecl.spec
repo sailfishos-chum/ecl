@@ -1,6 +1,6 @@
 Name:           ecl
 Version:        16.1.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Embeddable Common-Lisp
 
 License:        LGPLv2+ and BSD and MIT and Public Domain
@@ -46,7 +46,7 @@ BuildRequires:  gmp-devel
 #BuildRequires:  gc-devel
 #BuildRequires:  libatomic_ops-static
 BuildRequires:  libffi-devel
-BuildRequires:  emacs-common
+#BuildRequires:  emacs-common
 #BuildRequires:  docbook5-schemas
 #BuildRequires:  docbook5-style-xsl
 #BuildRequires:  xmlto
@@ -162,6 +162,9 @@ chmod a+x $RPM_BUILD_ROOT%{_libdir}/ecl-%{version}/ecl_min
 
 
 %changelog
+* Mon Feb 11 2019 Renaud Casenave-Péré <renaud@casenave-pere.fr - 16.1.3-2
+- Rebuilt for sailfishos 3.0.1.11
+
 * Fri Feb 24 2017 Jerry James <loganjerry@gmail.com> - 16.1.3-1
 - New upstream release
 

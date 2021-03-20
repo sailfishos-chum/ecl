@@ -1,0 +1,23 @@
+--- src/configure
++++ src/configure
+@@ -9919,6 +9919,7 @@ LSP_FEATURES="(cons :wants-dlopen ${LSP_FEATURES})"
+ else
+   enable_soname=no
+   LSP_LIBRARIES="${LIBPREFIX}ecl.${LIBEXT}"
++  CFLAGS="${CFLAGS} -fPIC"
+   ECL_LDRPATH=''
+ fi
+ 
+--- src/configure.ac
++++ src/configure.ac
+@@ -803,6 +803,7 @@ if test ${enable_shared} = "yes"; then
+ else
+   enable_soname=no
+   LSP_LIBRARIES="${LIBPREFIX}ecl.${LIBEXT}"
++  CFLAGS="${CFLAGS} -fPIC"
+   ECL_LDRPATH=''
+ fi
+ 
+-- 
+2.20.1
+

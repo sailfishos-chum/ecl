@@ -1,21 +1,20 @@
 Name:           ecl
 Version:        21.2.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Embeddable Common-Lisp
 
 License:        LGPLv2+ and BSD and MIT and Public Domain
 URL:            https://common-lisp.net/project/ecl/
 Source0:        https://common-lisp.net/project/%{name}/static/files/release/%{name}-%{version}.tgz
+Patch0:         %{name}-%{version}-fpic-cflags-static.patch
 
 BuildRequires:  gcc
 BuildRequires:  pkgconfig
-BuildRequires:  gmp-devel
-BuildRequires:  libffi-devel
+BuildRequires:  m4
+BuildRequires:  make
 Requires:       gcc
 Requires:       libgcc%{?_isa}
 Requires:       glibc-devel%{?_isa}
-Requires:       gmp-devel%{?_isa}
-Requires:       libffi-devel%{?_isa}
 Requires(post): coreutils
 Requires(postun): coreutils
 
@@ -32,15 +31,30 @@ Gray streams.
 
 %prep
 %setup -q
+%patch0
 
 %build
-%configure --enable-threads --enable-boehm=included --enable-libatomic=included \
-           --enable-gmp=system --enable-c99complex --disable-manual --with-sse=yes \
-    CPPFLAGS=$(pkg-config --cflags libffi) \
-    CFLAGS="%{optflags} -Wno-unused -Wno-return-type -Wno-unknown-pragmas"
-make
+mkdir -p build-shared build-static
+srcdir=`pwd`/src
+echo "cd build-static && ${srcdir}/configure --srcdir=${srcdir}/ \"\$@\"" > configure && chmod +x configure
+%configure --enable-threads --enable-boehm=included \
+           --enable-libatomic=included --enable-gmp=included --with-dffi=included \
+           --enable-c99complex --disable-manual --disable-shared \
+           CFLAGS="%{optflags} -Wno-unused -Wno-return-type -Wno-unknown-pragmas"
+cd build-static && make -j 4 && cd ..
+
+echo "cd build-shared && ${srcdir}/configure --srcdir=${srcdir}/ \"\$@\"" > configure && chmod +x configure
+%configure  --enable-threads --enable-boehm=included \
+            --enable-libatomic=included --enable-gmp=included --with-dffi=included \
+            --enable-c99complex --disable-manual \
+            CFLAGS="%{optflags} -Wno-unused -Wno-return-type -Wno-unknown-pragmas"
+cd build-shared && make -j 4 && cd ..
 
 %install
+cd build-static
+make DESTDIR=$RPM_BUILD_ROOT install
+
+cd ../build-shared
 make DESTDIR=$RPM_BUILD_ROOT install
 
 # Remove installed files that are in the wrong place
@@ -92,6 +106,11 @@ chmod a+x $RPM_BUILD_ROOT%{_libdir}/ecl-%{version}/ecl_min
 %{_libdir}/libecl.so.21.2*
 %{_libdir}/libecl.so.21
 %{_libdir}/libecl.so
+%{_libdir}/libecl.a
+%{_libdir}/libeclatomic.a
+%{_libdir}/libeclffi.a
+%{_libdir}/libeclgc.a
+%{_libdir}/libeclgmp.a
 %{_includedir}/ecl
 %{_mandir}/man1/*
 #%doc examples CHANGELOG ecl-doc/html
@@ -100,7 +119,10 @@ chmod a+x $RPM_BUILD_ROOT%{_libdir}/ecl-%{version}/ecl_min
 
 
 %changelog
-* Mon Feb 15 2021 Renaud Casenave-Péré <renaud@casenave-pere.fr> - 21.1.2-1
+* Sun Mar 21 2021 Renaud Casenave-Péré <renaud@casenave-pere.fr> - 21.2.1-2
+- Add static libraries
+
+* Mon Feb 15 2021 Renaud Casenave-Péré <renaud@casenave-pere.fr> - 21.2.1-1
 - Upstream update
 
 * Mon Feb 11 2019 Renaud Casenave-Péré <renaud@casenave-pere.fr> - 16.1.3-2

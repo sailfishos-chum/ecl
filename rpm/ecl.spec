@@ -5,7 +5,7 @@ Summary:        Embeddable Common-Lisp
 
 License:        LGPLv2+ and BSD and MIT and Public Domain
 URL:            https://common-lisp.net/project/ecl/
-Source0:        https://common-lisp.net/project/%{name}/static/files/release/%{name}-%{version}.tgz
+Source0:        %{name}-%{version}.tar.xz
 Patch0:         %{name}-%{version}-fpic-cflags-static.patch
 
 BuildRequires:  gcc
@@ -30,7 +30,7 @@ Gray streams.
 
 
 %prep
-%setup -q
+%setup -q -n %{name}-%{version}/ecl
 %patch0
 
 %build
@@ -62,46 +62,22 @@ rm -fr $RPM_BUILD_ROOT%{_docdir}
 rm -f $RPM_BUILD_ROOT%{_libdir}/Copyright
 rm -f $RPM_BUILD_ROOT%{_libdir}/LGPL
 
-# Install the man pages
-#mkdir -p $RPM_BUILD_ROOT%{_mandir}/man1
-#sed -e "s|@bindir@|%{_bindir}|" src/doc/ecl.man.in > \
-#  $RPM_BUILD_ROOT%{_mandir}/man1/ecl.1
-#cp -p src/doc/ecl-config.man.in $RPM_BUILD_ROOT%{_mandir}/man1/ecl-config.1
-
 # Add missing executable bits
 chmod a+x $RPM_BUILD_ROOT%{_libdir}/ecl-%{version}/dpp
 chmod a+x $RPM_BUILD_ROOT%{_libdir}/ecl-%{version}/ecl_min
 
-# Install the desktop file
-#desktop-file-install --dir=$RPM_BUILD_ROOT%{_datadir}/applications %{SOURCE2}
-
-# Install the desktop icon
-#mkdir -p $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/scalable/apps
-#cp -p %{SOURCE3} $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/scalable/apps
-
+# Remove executable bits from static libraries
+chmod a-x $RPM_BUILD_ROOT%{_libdir}/libecl*.a
 
 %post
 /sbin/ldconfig
-#touch --no-create %{_datadir}/icons/hicolor
 
- 
 %postun
 /sbin/ldconfig
-#if [ $1 -eq 0 ]; then
-#  touch --no-create %{_datadir}/icons/hicolor
-#  gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
-#fi
-
-
-#%posttrans
-#gtk-update-icon-cache %{_datadir}/icons/hicolor >&/dev/null ||:
-
 
 %files
 %{_bindir}/ecl
 %{_bindir}/ecl-config
-#%{_datadir}/applications/ecl.desktop
-#%{_datadir}/icons/hicolor/scalable/apps/ecl.svg
 %{_libdir}/ecl*
 %{_libdir}/libecl.so.21.2*
 %{_libdir}/libecl.so.21
@@ -113,10 +89,7 @@ chmod a+x $RPM_BUILD_ROOT%{_libdir}/ecl-%{version}/ecl_min
 %{_libdir}/libeclgmp.a
 %{_includedir}/ecl
 %{_mandir}/man1/*
-#%doc examples CHANGELOG ecl-doc/html
-#%doc src/doc/amop.txt src/doc/types-and-classes
 %doc COPYING LICENSE
-
 
 %changelog
 * Sun Mar 21 2021 Renaud Casenave-Péré <renaud@casenave-pere.fr> - 21.2.1-2

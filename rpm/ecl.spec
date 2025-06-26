@@ -75,8 +75,8 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/Copyright
 rm -f $RPM_BUILD_ROOT%{_libdir}/LGPL
 
 # Add missing executable bits
-chmod a+x $RPM_BUILD_ROOT%{_libdir}/ecl-%{version}/dpp
-chmod a+x $RPM_BUILD_ROOT%{_libdir}/ecl-%{version}/ecl_min
+chmod a+x $RPM_BUILD_ROOT%{_libdir}/ecl-*/dpp
+chmod a+x $RPM_BUILD_ROOT%{_libdir}/ecl-*/ecl_min
 
 # Remove executable bits from static libraries
 chmod a-x $RPM_BUILD_ROOT%{_libdir}/libecl*.a

@@ -1,6 +1,6 @@
 Name:           ecl
-Version:        21.2.1
-Release:        2%{?dist}
+Version:        24.5.10
+Release:        1%{?dist}
 Summary:        Embeddable Common-Lisp
 
 License:        LGPLv2+ and BSD and MIT and Public Domain
@@ -25,13 +25,25 @@ bytecode compiler and interpreter, the ability to build standalone
 executables and libraries, and extensions such as ASDF, sockets, and
 Gray streams.
 
+%if "%{?vendor}" == "chum"
+Title: Embeddable Common-Lisp
+Type: other
+DeveloperName: Marius Gerbershagen
+Categories:
+ - Library
+Custom:
+   PackagingRepo: https://github.com/sailfishos-chum/ecl
+Links:
+   Homepage: %{url}
+%endif
+
+
 # no -devel package for header files is split off
 # since they are required by the main package
 
 
 %prep
-%setup -q -n %{name}-%{version}/ecl
-%patch0
+%autosetup -p1 -n %{name}-%{version}/ecl
 
 %build
 mkdir -p build-shared build-static
@@ -92,6 +104,9 @@ chmod a-x $RPM_BUILD_ROOT%{_libdir}/libecl*.a
 %doc COPYING LICENSE
 
 %changelog
+* Thu Jun 26 2025 Peter G. <sailfish@nephros.org> - 24.5.10-1
+- Upstream update
+
 * Sun Mar 21 2021 Renaud Casenave-Péré <renaud@casenave-pere.fr> - 21.2.1-2
 - Add static libraries
 

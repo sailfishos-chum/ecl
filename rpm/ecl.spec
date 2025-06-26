@@ -91,8 +91,7 @@ chmod a-x $RPM_BUILD_ROOT%{_libdir}/libecl*.a
 %{_bindir}/ecl
 %{_bindir}/ecl-config
 %{_libdir}/ecl*
-%{_libdir}/libecl.so.21.2*
-%{_libdir}/libecl.so.21
+%{_libdir}/libecl.so.*
 %{_libdir}/libecl.so
 %{_libdir}/libecl.a
 %{_libdir}/libeclatomic.a

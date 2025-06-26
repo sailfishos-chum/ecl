@@ -6,7 +6,7 @@ Summary:        Embeddable Common-Lisp
 License:        LGPLv2+ and BSD and MIT and Public Domain
 URL:            https://common-lisp.net/project/ecl/
 Source0:        %{name}-%{version}.tar.xz
-Patch0:         %{name}-%{version}-fpic-cflags-static.patch
+Patch0:         %{name}-fpic-cflags-static.patch
 
 BuildRequires:  gcc
 BuildRequires:  pkgconfig

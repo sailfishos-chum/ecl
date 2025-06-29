@@ -1,6 +1,9 @@
+%global major 24
+%global minor 5
+%global micro 10
 Name:           ecl
-Version:        24.5.10
-Release:        1%{?dist}
+Version:        %{major}.%{minor}.{micro}
+Release:        2%{?dist}
 Summary:        Embeddable Common-Lisp
 
 License:        LGPLv2+ and BSD and MIT and Public Domain
@@ -14,12 +17,7 @@ BuildRequires:  gmp-devel
 BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(libffi)
 BuildRequires:  pkgconfig(atomic_ops)
-Requires:       gcc
-Requires:       libgcc%{?_isa}
-Requires:       glibc-devel%{?_isa}
-Requires:       gmp-devel
-Requires:       pkgconfig(libffi)
-Requires:       pkgconfig(atomic_ops)
+Requires:       %{name}-devel
 Requires(post): coreutils
 Requires(postun): coreutils
 
@@ -35,17 +33,38 @@ Title: Embeddable Common-Lisp
 Type: other
 DeveloperName: Marius Gerbershagen
 Categories:
- - Library
+- Library
 Custom:
-   PackagingRepo: https://github.com/sailfishos-chum/ecl
+PackagingRepo: https://github.com/sailfishos-chum/ecl
 Links:
-   Homepage: %{url}
+Homepage: %{url}
 %endif
 
+%package -n lib%{name}
+Summary:  Embeddable Common-Lisp -- shared library
+Group:    System/Libraries
+Requires: libgcc%{?_isa}
+Requires: glibc-devel%{?_isa}
+Requires: gmp-devel
+Requires: pkgconfig(libffi)
+Requires: pkgconfig(atomic_ops)
 
-# no -devel package for header files is split off
-# since they are required by the main package
+%description -n lib%{name}
+This package contains the ECL shared library.
 
+%package devel
+Summary:  Embeddable Common-Lisp -- development files
+Group:    Development/Libraries/C and C++
+Requires: lib%{name} = %{version}
+
+%description devel
+ECL (Embeddable Common Lisp) is an implementation of the Common Lisp
+language as defined by the ANSI X3J13 specification.  ECL features a
+bytecode compiler and interpreter, the ability to build standalone
+executables and libraries, and extensions such as ASDF, sockets, and
+Gray streams.
+
+This package contains development files for ECL.
 
 %prep
 %autosetup -p1 -n %{name}-%{version}/ecl
@@ -76,16 +95,27 @@ chmod a+x $RPM_BUILD_ROOT%{_libdir}/ecl-*/ecl_min
 /sbin/ldconfig
 
 %files
-%{_bindir}/ecl
-%{_bindir}/ecl-config
-%{_libdir}/ecl*
-%{_libdir}/libecl.so.*
-%{_libdir}/libecl.so
-%{_includedir}/ecl
-%{_mandir}/man1/*
-%doc COPYING LICENSE
+%license COPYING LICENSE
+%{_bindir}/%{name}
+%{_libdir}/%{name}-*/
+%{_mandir}/man1/%{name}.1.gz
+
+%files -n lib%{name}
+%license COPYING LICENSE
+%{_libdir}/lib%{name}.so.*
+
+%files devel
+%license COPYING LICENSE
+%{_bindir}/%{name}-config
+%{_libdir}/lib%{name}.so
+%{_includedir}/%{name}/
+%{_mandir}/man1/%{name}-config.1.gz
 
 %changelog
+* Sun Jun 29 2025 Renaud Casenave-Péré <renaud@casenave-pere.fr> - 24.5.10-2
+- Remove static libraries
+- Split into main/lib/devel packages
+
 * Thu Jun 26 2025 Peter G. <sailfish@nephros.org> - 24.5.10-1
 - Upstream update
 

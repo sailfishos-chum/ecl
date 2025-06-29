@@ -8,12 +8,18 @@ URL:            https://common-lisp.net/project/ecl/
 Source0:        %{name}-%{version}.tar.xz
 
 BuildRequires:  gcc
-BuildRequires:  pkgconfig
 BuildRequires:  m4
 BuildRequires:  make
+BuildRequires:  gmp-devel
+BuildRequires:  pkgconfig
+BuildRequires:  pkgconfig(libffi)
+BuildRequires:  pkgconfig(atomic_ops)
 Requires:       gcc
 Requires:       libgcc%{?_isa}
 Requires:       glibc-devel%{?_isa}
+Requires:       gmp-devel
+Requires:       pkgconfig(libffi)
+Requires:       pkgconfig(atomic_ops)
 Requires(post): coreutils
 Requires(postun): coreutils
 
@@ -45,9 +51,9 @@ Links:
 %autosetup -p1 -n %{name}-%{version}/ecl
 
 %build
-%configure  --enable-threads --enable-boehm=included \
-            --enable-libatomic=included --enable-gmp=included --with-dffi=included \
-            --enable-c99complex --disable-manual \
+%configure  --enable-boehm=included \
+            --enable-libatomic=system --enable-gmp=system --with-dffi=system \
+            --enable-c99complex --with-sse=yes --disable-manual \
             CFLAGS="%{optflags} -Wno-unused -Wno-return-type -Wno-unknown-pragmas"
 make
 

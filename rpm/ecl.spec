@@ -6,7 +6,6 @@ Summary:        Embeddable Common-Lisp
 License:        LGPLv2+ and BSD and MIT and Public Domain
 URL:            https://common-lisp.net/project/ecl/
 Source0:        %{name}-%{version}.tar.xz
-Patch0:         %{name}-fpic-cflags-static.patch
 
 BuildRequires:  gcc
 BuildRequires:  pkgconfig
@@ -46,27 +45,13 @@ Links:
 %autosetup -p1 -n %{name}-%{version}/ecl
 
 %build
-mkdir -p build-shared build-static
-srcdir=`pwd`/src
-echo "cd build-static && ${srcdir}/configure --srcdir=${srcdir}/ \"\$@\"" > configure && chmod +x configure
-%configure --enable-threads --enable-boehm=included \
-           --enable-libatomic=included --enable-gmp=included --with-dffi=included \
-           --enable-c99complex --disable-manual --disable-shared \
-           CFLAGS="%{optflags} -Wno-unused -Wno-return-type -Wno-unknown-pragmas"
-cd build-static && make -j 4 && cd ..
-
-echo "cd build-shared && ${srcdir}/configure --srcdir=${srcdir}/ \"\$@\"" > configure && chmod +x configure
 %configure  --enable-threads --enable-boehm=included \
             --enable-libatomic=included --enable-gmp=included --with-dffi=included \
             --enable-c99complex --disable-manual \
             CFLAGS="%{optflags} -Wno-unused -Wno-return-type -Wno-unknown-pragmas"
-cd build-shared && make -j 4 && cd ..
+make
 
 %install
-cd build-static
-make DESTDIR=$RPM_BUILD_ROOT install
-
-cd ../build-shared
 make DESTDIR=$RPM_BUILD_ROOT install
 
 # Remove installed files that are in the wrong place
@@ -77,9 +62,6 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/LGPL
 # Add missing executable bits
 chmod a+x $RPM_BUILD_ROOT%{_libdir}/ecl-*/dpp
 chmod a+x $RPM_BUILD_ROOT%{_libdir}/ecl-*/ecl_min
-
-# Remove executable bits from static libraries
-chmod a-x $RPM_BUILD_ROOT%{_libdir}/libecl*.a
 
 %post
 /sbin/ldconfig
@@ -93,11 +75,6 @@ chmod a-x $RPM_BUILD_ROOT%{_libdir}/libecl*.a
 %{_libdir}/ecl*
 %{_libdir}/libecl.so.*
 %{_libdir}/libecl.so
-%{_libdir}/libecl.a
-%{_libdir}/libeclatomic.a
-%{_libdir}/libeclffi.a
-%{_libdir}/libeclgc.a
-%{_libdir}/libeclgmp.a
 %{_includedir}/ecl
 %{_mandir}/man1/*
 %doc COPYING LICENSE

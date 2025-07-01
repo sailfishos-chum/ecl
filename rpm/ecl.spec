@@ -3,7 +3,7 @@
 %global micro 10
 Name:           ecl
 Version:        %{major}.%{minor}.{micro}
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Embeddable Common-Lisp
 
 License:        LGPLv2+ and BSD and MIT and Public Domain
@@ -18,6 +18,11 @@ BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(libffi)
 BuildRequires:  pkgconfig(atomic_ops)
 Requires:       %{name}-devel
+Requires:       libgcc%{?_isa}
+Requires:       glibc-devel%{?_isa}
+Requires:       gmp-devel
+Requires:       pkgconfig(libffi)
+Requires:       pkgconfig(atomic_ops)
 Requires(post): coreutils
 Requires(postun): coreutils
 
@@ -43,11 +48,6 @@ Homepage: %{url}
 %package -n lib%{name}
 Summary:  Embeddable Common-Lisp -- shared library
 Group:    System/Libraries
-Requires: libgcc%{?_isa}
-Requires: glibc-devel%{?_isa}
-Requires: gmp-devel
-Requires: pkgconfig(libffi)
-Requires: pkgconfig(atomic_ops)
 
 %description -n lib%{name}
 This package contains the ECL shared library.
@@ -112,6 +112,9 @@ chmod a+x $RPM_BUILD_ROOT%{_libdir}/ecl-*/ecl_min
 %{_mandir}/man1/%{name}-config.1.gz
 
 %changelog
+* Tue Jul  1 2025 Renaud Casenave-Péré <renaud@casenave-pere.fr> - 24.5.10-3
+- Fix package dependencies
+
 * Sun Jun 29 2025 Renaud Casenave-Péré <renaud@casenave-pere.fr> - 24.5.10-2
 - Remove static libraries
 - Split into main/lib/devel packages

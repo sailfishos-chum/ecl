@@ -1,9 +1,9 @@
-%global major 24
+%global major 26
 %global minor 5
-%global micro 10
+%global micro 5
 Name:           ecl
 Version:        %{major}.%{minor}.{micro}
-Release:        3%{?dist}
+Release:        1%{?dist}
 Summary:        Embeddable Common-Lisp
 
 License:        LGPLv2+ and BSD and MIT and Public Domain
@@ -112,6 +112,9 @@ chmod a+x $RPM_BUILD_ROOT%{_libdir}/ecl-*/ecl_min
 %{_mandir}/man1/%{name}-config.1.gz
 
 %changelog
+* Tue May 12 2026 Renaud Casenave-Péré <renaud@casenave-pere.fr> - 26.5.5-1
+- Upstream update
+
 * Tue Jul  1 2025 Renaud Casenave-Péré <renaud@casenave-pere.fr> - 24.5.10-3
 - Fix package dependencies
 

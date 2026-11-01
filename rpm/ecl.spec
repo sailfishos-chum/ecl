@@ -70,14 +70,30 @@ This package contains development files for ECL.
 %autosetup -p1 -n %{name}-%{version}/ecl
 
 %build
-%configure  --enable-boehm=included \
-            --enable-libatomic=system --enable-gmp=system --with-dffi=system \
-            --enable-c99complex --with-sse=yes --disable-manual \
-            CFLAGS="%{optflags} -Wno-unused -Wno-return-type -Wno-unknown-pragmas"
-make
+%define _lto_cflags %{nil}
+export CFLAGS="${CFLAGS} -std=gnu17"
+%configure \
+    --enable-boehm=included \
+    --disable-manual \
+    --enable-soname \
+    --disable-rpath \
+    --enable-gmp=system \
+    --enable-threads \
+    --enable-libatomic=system \
+    --with-dffi=system \
+    --with-defsystem \
+    --enable-c99complex \
+%ifarch %ix86
+    --with-sse=no \
+%endif
+    CFLAGS="%{optflags} -Wno-unused -Wno-return-type -Wno-unknown-pragmas" \
+    %{nil}
+
+# parallel build causes OBS to kill the builder
+%make_build  -j1
 
 %install
-make DESTDIR=$RPM_BUILD_ROOT install
+%make_install
 
 # Remove installed files that are in the wrong place
 rm -fr $RPM_BUILD_ROOT%{_docdir}
